@@ -1,18 +1,33 @@
 package com.sorcererxw.feedman.ui.activities;
 
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 
 import com.sorcererxw.feedman.ui.fragments.BaseFragment;
 
+import butterknife.ButterKnife;
+
 /**
- * Created by Sorcerer on 2016/9/1.
+ * @description:
+ * @author: Sorcerer
+ * @date: 2016/9/1
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
     protected abstract int getContentViewId();
 
-    protected abstract int getFragmentContentId();
+    protected abstract int getFragmentContainerId();
+
+    protected abstract void init(Bundle saveInstance);
+
+    @Override
+    protected void onCreate(Bundle saveInstance) {
+        super.onCreate(saveInstance);
+        setContentView(getContentViewId());
+        ButterKnife.bind(this);
+        init(saveInstance);
+    }
 
     public void removeFragment() {
         if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
@@ -25,7 +40,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void addFragment(BaseFragment fragment) {
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(getFragmentContentId(), fragment, fragment.getClass().getSimpleName())
+                    .replace(getFragmentContainerId(), fragment,
+                            fragment.getClass().getSimpleName())
                     .addToBackStack(fragment.getClass().getSimpleName())
                     .commitAllowingStateLoss();
         }

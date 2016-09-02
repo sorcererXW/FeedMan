@@ -13,7 +13,9 @@ import com.sorcererxw.feedman.ui.activities.BaseActivity;
 import butterknife.ButterKnife;
 
 /**
- * Created by Sorcerer on 2016/9/1.
+ * @description:
+ * @author: Sorcerer
+ * @date: 2016/9/1
  */
 public abstract class BaseFragment extends Fragment {
     protected abstract int getLayoutId();
@@ -30,6 +32,7 @@ public abstract class BaseFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle saveInstance) {
         View view = inflater.inflate(getLayoutId(), parent, false);
         ButterKnife.bind(this, view);
+        initView(view, saveInstance);
         return view;
     }
 
