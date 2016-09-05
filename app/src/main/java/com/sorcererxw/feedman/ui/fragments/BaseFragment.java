@@ -1,6 +1,5 @@
 package com.sorcererxw.feedman.ui.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,7 +19,7 @@ import butterknife.ButterKnife;
 public abstract class BaseFragment extends Fragment {
     protected abstract int getLayoutId();
 
-    protected abstract void initView(View view, Bundle saveInstance);
+    protected abstract void init(View view, Bundle saveInstance);
 
     private BaseActivity mActivity;
 
@@ -32,7 +31,7 @@ public abstract class BaseFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle saveInstance) {
         View view = inflater.inflate(getLayoutId(), parent, false);
         ButterKnife.bind(this, view);
-        initView(view, saveInstance);
+        init(view, saveInstance);
         return view;
     }
 

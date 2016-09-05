@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.widget.FrameLayout;
 
 import com.sorcererxw.feedman.R;
-import com.sorcererxw.feedman.ui.fragments.SourceFragment;
+import com.sorcererxw.feedman.ui.fragments.FeedFragment;
 
 import butterknife.BindView;
 
@@ -30,6 +30,6 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void init(Bundle saveInstance) {
-        addFragment(SourceFragment.newInstance());
+        addFragment(FeedFragment.newInstance());
     }
 }

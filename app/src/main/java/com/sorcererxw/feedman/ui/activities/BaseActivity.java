@@ -1,6 +1,8 @@
 package com.sorcererxw.feedman.ui.activities;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 
@@ -37,13 +39,19 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+    private BaseFragment mLastFragment = null;
+    private BaseFragment mCurrentFragment = null;
+
     public void addFragment(BaseFragment fragment) {
+        addFragment(fragment, fragment.getClass().getSimpleName());
+    }
+
+    public void addFragment(BaseFragment fragment, String tag) {
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(getFragmentContainerId(), fragment,
-                            fragment.getClass().getSimpleName())
-                    .addToBackStack(fragment.getClass().getSimpleName())
-                    .commitAllowingStateLoss();
+                    .replace(getFragmentContainerId(), fragment, tag)
+                    .addToBackStack(tag)
+                    .commit();
         }
     }
 
