@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.widget.FrameLayout;
 
 import com.sorcererxw.feedman.R;
-import com.sorcererxw.feedman.ui.fragments.FeedFragment;
+import com.sorcererxw.feedman.ui.activities.base.BaseFragmentActivity;
 
 import butterknife.BindView;
 
@@ -13,7 +13,7 @@ import butterknife.BindView;
  * @author: Sorcerer
  * @date: 2016/9/1
  */
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseFragmentActivity {
 
     @BindView(R.id.frameLayout_main_container)
     FrameLayout mContainer;
@@ -30,6 +30,6 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void init(Bundle saveInstance) {
-        addFragment(FeedFragment.newInstance());
+//        addFragment(FeedFragment.newInstance());
     }
 }

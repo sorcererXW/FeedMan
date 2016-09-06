@@ -1,4 +1,4 @@
-package com.sorcererxw.feedman.ui.fragments;
+package com.sorcererxw.feedman.ui.fragments.base;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -7,7 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.sorcererxw.feedman.ui.activities.BaseActivity;
+import com.sorcererxw.feedman.ui.activities.base.BaseActivity;
+import com.sorcererxw.feedman.ui.activities.base.BaseFragmentActivity;
 
 import butterknife.ButterKnife;
 
@@ -44,13 +45,15 @@ public abstract class BaseFragment extends Fragment {
     }
 
     protected void addFragment(BaseFragment fragment) {
-        if (fragment != null) {
-            getHoldingActivity().addFragment(fragment);
+        if (fragment != null && getHoldingActivity() instanceof BaseFragmentActivity) {
+            ((BaseFragmentActivity) getHoldingActivity()).addFragment(fragment);
         }
     }
 
     protected void removeFragment() {
-        getHoldingActivity().removeFragment();
+        if (getHoldingActivity() instanceof BaseFragmentActivity) {
+            ((BaseFragmentActivity) getHoldingActivity()).removeFragment();
+        }
     }
 
 }

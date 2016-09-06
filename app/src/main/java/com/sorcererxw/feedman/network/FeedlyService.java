@@ -4,7 +4,6 @@ import com.sorcererxw.feedman.models.FeedlyEntryBean;
 import com.sorcererxw.feedman.models.FeedlyFeedBean;
 import com.sorcererxw.feedman.models.FeedlySearchResultBean;
 import com.sorcererxw.feedman.models.FeedlyStreamBean;
-import com.sorcererxw.feedman.models.FeedlyTest;
 
 import java.util.List;
 
@@ -32,4 +31,5 @@ public interface FeedlyService {
 
     @GET("/v3/entries/{entryId}")
     Call<List<FeedlyEntryBean>> getEntry(@Path("entryId") String entryId);
+
 }

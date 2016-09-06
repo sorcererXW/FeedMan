@@ -55,6 +55,16 @@ public abstract class BaseTextAdapter<E>
         notifyDataSetChanged();
     }
 
+    public void addData(List<E> been) {
+        mList.addAll(been);
+        notifyDataSetChanged();
+    }
+
+    public void clearData() {
+        mList.clear();
+        notifyDataSetChanged();
+    }
+
     public List<E> getData() {
         return mList;
     }

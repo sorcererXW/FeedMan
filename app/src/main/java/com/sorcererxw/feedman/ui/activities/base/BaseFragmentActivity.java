@@ -1,35 +1,17 @@
-package com.sorcererxw.feedman.ui.activities;
+package com.sorcererxw.feedman.ui.activities.base;
 
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 
-import com.sorcererxw.feedman.ui.fragments.BaseFragment;
-
-import butterknife.ButterKnife;
+import com.sorcererxw.feedman.ui.fragments.base.BaseFragment;
 
 /**
  * @description:
  * @author: Sorcerer
  * @date: 2016/9/1
  */
-public abstract class BaseActivity extends AppCompatActivity {
-
-    protected abstract int getContentViewId();
+public abstract class BaseFragmentActivity extends BaseActivity {
 
     protected abstract int getFragmentContainerId();
-
-    protected abstract void init(Bundle saveInstance);
-
-    @Override
-    protected void onCreate(Bundle saveInstance) {
-        super.onCreate(saveInstance);
-        setContentView(getContentViewId());
-        ButterKnife.bind(this);
-        init(saveInstance);
-    }
 
     public void removeFragment() {
         if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
