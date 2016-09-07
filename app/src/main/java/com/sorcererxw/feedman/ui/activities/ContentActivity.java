@@ -29,9 +29,11 @@ public class ContentActivity extends BaseActivity {
     @Override
     protected void init(Bundle saveInstance) {
         FeedlyEntryBean bean = TempBag.sTempEntry;
-        if(bean==null){
+        if (bean == null) {
             finish();
         }
-        mContent.setText(Html.fromHtml(bean.getSummary().getContent()));
+        if (bean != null) {
+            mContent.setText(Html.fromHtml(bean.getSummary().getContent()));
+        }
     }
 }
