@@ -33,7 +33,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
 }
+
+
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -63,4 +71,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.7'
     // okhttp
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    // oauth
+    compile 'org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.0'
+
 }

@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.EditText;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -16,17 +17,23 @@ import com.sorcererxw.feedman.R;
 import com.sorcererxw.feedman.models.FeedlyFeedBean;
 import com.sorcererxw.feedman.models.FeedlySearchResultBean;
 import com.sorcererxw.feedman.network.FeedlyService;
+import com.sorcererxw.feedman.network.FeedlyServiceProvider;
 import com.sorcererxw.feedman.ui.activities.base.BaseActivity;
 import com.sorcererxw.feedman.ui.adapters.BaseTextAdapter;
 import com.sorcererxw.feedman.ui.adapters.FeedAdapter;
 import com.sorcererxw.feedman.ui.adapters.FeedSearchAdapter;
 
+import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
+import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
+
 import butterknife.BindView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 /**
  * @description:
@@ -42,7 +49,7 @@ public class FeedActivity extends BaseActivity {
 
     private FeedAdapter mAdapter;
 
-    private FeedlyService mService;
+    private FeedlyService mService = FeedlyServiceProvider.GsonService();
 
     @Override
     protected int getContentViewId() {
@@ -65,6 +72,8 @@ public class FeedActivity extends BaseActivity {
         mRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
+        startActivity(new Intent(this, AuthActivity.class));
+
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,11 +95,7 @@ public class FeedActivity extends BaseActivity {
             }
         });
 
-        mService = new Retrofit.Builder()
-                .baseUrl("http://cloud.feedly.com")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(FeedlyService.class);
+
     }
 
     private void add(String s) {

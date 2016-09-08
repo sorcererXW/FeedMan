@@ -8,9 +8,13 @@ import com.sorcererxw.feedman.models.FeedlyStreamBean;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import rx.Observable;
 
 /**
  * @description:
@@ -32,4 +36,11 @@ public interface FeedlyService {
     @GET("/v3/entries/{entryId}")
     Call<List<FeedlyEntryBean>> getEntry(@Path("entryId") String entryId);
 
+    @FormUrlEncoded
+    @POST("/v3/auth/token")
+    Observable<FeedlyToken> getAccessToken(@Field("code") String code,
+                                           @Field("client_id") String clientId,
+                                           @Field("client_secret") String clientSecret,
+                                           @Field("redirect_uri") String redirectUri,
+                                           @Field("grant_type") String grantType);
 }

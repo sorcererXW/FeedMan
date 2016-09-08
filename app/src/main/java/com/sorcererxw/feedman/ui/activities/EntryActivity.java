@@ -10,6 +10,7 @@ import com.sorcererxw.feedman.R;
 import com.sorcererxw.feedman.models.FeedlyEntryBean;
 import com.sorcererxw.feedman.models.FeedlyStreamBean;
 import com.sorcererxw.feedman.network.FeedlyService;
+import com.sorcererxw.feedman.network.FeedlyServiceProvider;
 import com.sorcererxw.feedman.ui.activities.base.BaseActivity;
 import com.sorcererxw.feedman.ui.adapters.BaseTextAdapter;
 import com.sorcererxw.feedman.ui.adapters.EntryAdapter;
@@ -18,11 +19,11 @@ import com.sorcererxw.feedman.util.TempBag;
 import java.util.List;
 
 import butterknife.BindView;
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * @description:
@@ -39,7 +40,7 @@ public class EntryActivity extends BaseActivity {
 
     private EntryAdapter mAdapter;
 
-    private FeedlyService mService;
+    private FeedlyService mService = FeedlyServiceProvider.GsonService();
 
     @Override
     protected int getContentViewId() {
@@ -63,13 +64,12 @@ public class EntryActivity extends BaseActivity {
         mRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        mService = new Retrofit.Builder()
-                .baseUrl("http://cloud.feedly.com")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(FeedlyService.class);
-
         loadData();
+
+        new Retrofit.Builder()
+                .baseUrl("http://cloud.feedly.com")
+                .client(new OkHttpClient());
+
     }
 
     private void loadData() {
