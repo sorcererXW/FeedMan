@@ -1,23 +1,16 @@
 package com.sorcererxw.feedman.ui.activities;
 
-import android.accounts.Account;
-import android.app.ProgressDialog;
-import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 import com.sorcererxw.feedman.R;
-import com.sorcererxw.feedman.network.FeedlyService;
-import com.sorcererxw.feedman.network.FeedlyServiceProvider;
+import com.sorcererxw.feedman.api.feedly.FeedlyService;
+import com.sorcererxw.feedman.api.feedly.FeedlyServiceProvider;
 import com.sorcererxw.feedman.ui.activities.base.BaseActivity;
 
 import butterknife.BindView;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * @description:

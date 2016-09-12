@@ -2,7 +2,7 @@ package com.sorcererxw.feedman.ui.adapters;
 
 import android.content.Context;
 
-import com.sorcererxw.feedman.models.FeedlyEntryBean;
+import com.sorcererxw.feedman.api.feedly.FeedlyEntryBean;
 
 /**
  * @description:

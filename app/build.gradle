@@ -55,8 +55,8 @@ dependencies {
     compile 'io.reactivex:rxjava:1.1.9'
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.artemzin.rxjava:proguard-rules:1.1.9.0'
-    // log
-    compile 'com.github.zhaokaiqiang.klog:library:1.5.0'
+    // sqlbrite
+    compile 'com.squareup.sqlbrite:sqlbrite:0.7.0'
     // retrofit
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
@@ -73,5 +73,6 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     // oauth
     compile 'org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.0'
-
+    // log
+    compile 'com.github.zhaokaiqiang.klog:library:1.5.0'
 }

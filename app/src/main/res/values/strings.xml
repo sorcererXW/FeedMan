@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Feed Man</string>
+
+    <string name="feedly_client_id">quote</string>
+    <string name="feedly_client_secret">FE01GP77QW4O1N4GYGOKWL1PX1Y6</string>
+    <string name="feedly_endpoint">feedly.com</string>
+    <string name="feedly_redirect_url">http://localhost</string>
+    <string name="feedly_scope">https://cloud.feedly.com/subscriptions</string>
 </resources>

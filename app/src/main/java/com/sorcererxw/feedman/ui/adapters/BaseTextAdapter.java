@@ -1,6 +1,7 @@
 package com.sorcererxw.feedman.ui.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,6 +80,11 @@ public abstract class BaseTextAdapter<E>
     @Override
     public void onBindViewHolder(final BaseTextViewHolder holder, int position) {
         holder.content.setText(convert(mList.get(position)));
+        if (isBold(mList.get(position))) {
+            holder.content.setTypeface(null, Typeface.BOLD);
+        } else {
+            holder.content.setTypeface(null, Typeface.NORMAL);
+        }
         if (mOnItemClickListener != null) {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -103,5 +109,9 @@ public abstract class BaseTextAdapter<E>
     public void setOnItemClickListener(OnItemClickListener<E> onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
         notifyDataSetChanged();
+    }
+
+    public boolean isBold(E bean) {
+        return false;
     }
 }

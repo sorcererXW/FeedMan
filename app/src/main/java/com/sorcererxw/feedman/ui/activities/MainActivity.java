@@ -1,35 +1,29 @@
 package com.sorcererxw.feedman.ui.activities;
 
-import android.os.Bundle;
-import android.widget.FrameLayout;
-
 import com.sorcererxw.feedman.R;
+import com.sorcererxw.feedman.ui.activities.base.BaseActivity;
 import com.sorcererxw.feedman.ui.activities.base.BaseFragmentActivity;
-
-import butterknife.BindView;
+import com.sorcererxw.feedman.ui.fragments.FeedFragment;
+import com.sorcererxw.feedman.ui.fragments.base.BaseFragment;
 
 /**
  * @description:
  * @author: Sorcerer
- * @date: 2016/9/1
+ * @date: 2016/9/12
  */
 public class MainActivity extends BaseFragmentActivity {
-
-    @BindView(R.id.frameLayout_main_container)
-    FrameLayout mContainer;
-
-    @Override
-    protected int getContentViewId() {
-        return R.layout.activity_main;
-    }
-
     @Override
     protected int getFragmentContainerId() {
         return R.id.frameLayout_main_container;
     }
 
     @Override
-    protected void init(Bundle saveInstance) {
-//        addFragment(FeedFragment.newInstance());
+    protected BaseFragment getFirstFragment() {
+        return FeedFragment.newInstance();
+    }
+
+    @Override
+    protected int getContentViewId() {
+        return R.layout.activity_main;
     }
 }

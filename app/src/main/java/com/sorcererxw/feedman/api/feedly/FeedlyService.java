@@ -1,9 +1,6 @@
-package com.sorcererxw.feedman.network;
+package com.sorcererxw.feedman.api.feedly;
 
-import com.sorcererxw.feedman.models.FeedlyEntryBean;
-import com.sorcererxw.feedman.models.FeedlyFeedBean;
-import com.sorcererxw.feedman.models.FeedlySearchResultBean;
-import com.sorcererxw.feedman.models.FeedlyStreamBean;
+import com.sorcererxw.feedman.models.AccessToken;
 
 import java.util.List;
 
@@ -29,18 +26,30 @@ public interface FeedlyService {
     @GET("/v3/feeds/{feedId}")
     Call<FeedlyFeedBean> getFeed(@Path("feedId") String feedId);
 
+    @GET("/v3/streams/contents")
+    Observable<FeedlyStream> getFeedStream(@Query("streamId") String streamId,
+                                           @Query("count") int count,
+                                           @Query("unreadOnly") boolean unreadOnly);
+
     @GET("/v3/streams/{streamId}/ids")
-    Call<FeedlyStreamBean> getStream(@Path("streamId") String streamId,
-                                     @Query("count") int count);
+    Call<FeedlyStream> getStream(@Path("streamId") String streamId,
+                                       @Query("count") int count,
+                                       @Query("unreadOnly") boolean unreadOnly);
 
     @GET("/v3/entries/{entryId}")
     Call<List<FeedlyEntryBean>> getEntry(@Path("entryId") String entryId);
 
-    @FormUrlEncoded
     @POST("/v3/auth/token")
-    Observable<FeedlyToken> getAccessToken(@Field("code") String code,
+    @FormUrlEncoded
+    Observable<AccessToken> getAccessToken(@Field("code") String code,
                                            @Field("client_id") String clientId,
                                            @Field("client_secret") String clientSecret,
                                            @Field("redirect_uri") String redirectUri,
                                            @Field("grant_type") String grantType);
+
+    @GET("/v3/profile")
+    Observable<FeedlyProfile> getProfile();
+
+    @GET("/v3/subscriptions")
+    Observable<List<FeedlySubscription>> getSubscriptions();
 }
