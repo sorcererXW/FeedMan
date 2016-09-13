@@ -20,5 +20,4 @@ public class FeedAdapter extends BaseTextAdapter<FeedlyFeedBean> {
         return bean.getTitle();
     }
 
-
 }

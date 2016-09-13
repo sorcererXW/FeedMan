@@ -5,7 +5,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.sorcererxw.feedman.FeedManApplication;
+import com.sorcererxw.feedman.FeedManApp;
 import com.sorcererxw.feedman.R;
 import com.sorcererxw.feedman.api.feedly.FeedlyClient;
 import com.sorcererxw.feedman.api.feedly.FeedlyEntry;
@@ -54,7 +54,9 @@ public class EntryFragment extends BaseFragment {
     protected void init(View view, Bundle saveInstance) {
         mFeedID = getArguments().getString(KEY_FEED_ID);
 
-        FeedlyClient client = new FeedlyClient(getContext(), FeedManApplication.sCurrentAccount);
+        FeedlyClient client = new FeedlyClient(getContext(),
+                FeedManApp.getDB(getContext()).getAccounts()
+                        .getAccount(FeedManApp.getPrefs(getContext()).currentAccount.getValue()));
 
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(

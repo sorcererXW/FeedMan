@@ -5,14 +5,15 @@ import android.view.KeyEvent;
 
 import com.sorcererxw.feedman.ui.fragments.base.BaseFragment;
 
+import java.util.Stack;
+
 /**
  * @description:
  * @author: Sorcerer
  * @date: 2016/9/1
  */
 public abstract class BaseFragmentActivity extends BaseActivity {
-
-    protected abstract int getFragmentContainerId();
+  protected abstract int getFragmentContainerId();
 
     protected abstract BaseFragment getFirstFragment();
 
@@ -26,7 +27,8 @@ public abstract class BaseFragmentActivity extends BaseActivity {
                 .commit();
     }
 
-    public void removeFragment() {
 
+    public void removeFragment() {
+        getSupportFragmentManager().popBackStack();
     }
 }

@@ -13,7 +13,7 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import com.socks.library.KLog;
-import com.sorcererxw.feedman.FeedManApplication;
+import com.sorcererxw.feedman.FeedManApp;
 import com.sorcererxw.feedman.R;
 import com.sorcererxw.feedman.models.Account;
 import com.sorcererxw.feedman.ui.activities.MainActivity;
@@ -131,7 +131,8 @@ public abstract class WebAuthFragment extends BaseFragment {
 
     protected void addAccount(Account account) {
         Toast.makeText(getContext(), "has account", Toast.LENGTH_SHORT).show();
-        FeedManApplication.sCurrentAccount = account;
+        FeedManApp.getPrefs(getContext()).currentAccount.setValue(account.getId());
+        FeedManApp.getDB(getContext()).getAccounts().addAccount(account);
         Intent intent = new Intent(getHoldingActivity(), MainActivity.class);
         getHoldingActivity().startActivity(intent);
     }

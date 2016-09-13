@@ -1,14 +1,17 @@
 package com.sorcererxw.feedman.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.content.ContentValues;
+import android.database.Cursor;
+
+import com.sorcererxw.feedman.database.DB;
+import com.sorcererxw.feedman.database.tables.AccountTable;
 
 /**
  * @description:
  * @author: Sorcerer
  * @date: 2016/9/9
  */
-public class Account implements Parcelable {
+public class Account {
     public String getId() {
         return mId;
     }
@@ -92,41 +95,24 @@ public class Account implements Parcelable {
     private long mUnreadCount;
     private AccessToken mAccessToken;
 
-
-    @Override
-    public int describeContents() {
-        return 0;
+    public ContentValues toContentValues() {
+        ContentValues values = new ContentValues();
+        values.put(AccountTable.LABEL, mLabel);
+        values.put(AccountTable.ID, mId);
+        values.put(AccountTable.ACCESS_TOKEN, mAccessToken.getAccessToken());
+        values.put(AccountTable.REFRESH_TOKEN, mAccessToken.getRefreshToken());
+        values.put(AccountTable.TYPE, "feedly");
+        return values;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.mId);
-        dest.writeString(this.mLabel);
-        dest.writeLong(this.mSubscriptionsCount);
-        dest.writeLong(this.mUnreadCount);
-        dest.writeParcelable(this.mAccessToken, flags);
+    public static Account from(Cursor cursor) {
+        Builder builder = new Builder()
+                .id(DB.getString(cursor, AccountTable.ID))
+                .label(DB.getString(cursor, AccountTable.LABEL));
+        AccessToken accessToken = new AccessToken();
+        accessToken.setAccessToken(DB.getString(cursor, AccountTable.ACCESS_TOKEN));
+        accessToken.setRefreshToken(DB.getString(cursor, AccountTable.REFRESH_TOKEN));
+        builder.accessToken(accessToken);
+        return builder.build();
     }
-
-    public Account() {
-    }
-
-    protected Account(Parcel in) {
-        this.mId = in.readString();
-        this.mLabel = in.readString();
-        this.mSubscriptionsCount = in.readLong();
-        this.mUnreadCount = in.readLong();
-        this.mAccessToken = in.readParcelable(AccessToken.class.getClassLoader());
-    }
-
-    public static final Parcelable.Creator<Account> CREATOR = new Parcelable.Creator<Account>() {
-        @Override
-        public Account createFromParcel(Parcel source) {
-            return new Account(source);
-        }
-
-        @Override
-        public Account[] newArray(int size) {
-            return new Account[size];
-        }
-    };
 }

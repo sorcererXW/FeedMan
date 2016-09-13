@@ -3,6 +3,9 @@ package com.sorcererxw.feedman.util;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.IntegerRes;
+import android.support.annotation.NonNull;
+
+import com.socks.library.KLog;
 
 /**
  * @description:
@@ -14,7 +17,7 @@ public class FeedManPreference<T> {
     private String mKey;
     private SharedPreferences mPreferences;
 
-    public FeedManPreference(SharedPreferences sharedPreferences, String key, T defaultValue) {
+    public FeedManPreference(SharedPreferences sharedPreferences, String key,@NonNull T defaultValue) {
         mDefaultValue = defaultValue;
         mKey = key;
         mPreferences = sharedPreferences;
@@ -24,14 +27,11 @@ public class FeedManPreference<T> {
         if (mDefaultValue instanceof String) {
             return (T) mPreferences.getString(mKey, (String) mDefaultValue);
         } else if (mDefaultValue instanceof Integer) {
-            return (T) Integer
-                    .valueOf(mPreferences.getInt(mKey, (Integer) mDefaultValue));
+            return (T) Integer.valueOf(mPreferences.getInt(mKey, (Integer) mDefaultValue));
         } else if (mDefaultValue instanceof Float) {
-            return (T) Float.valueOf(
-                    mPreferences.getFloat(mKey, (Float) mDefaultValue));
+            return (T) Float.valueOf(mPreferences.getFloat(mKey, (Float) mDefaultValue));
         } else if (mDefaultValue instanceof Boolean) {
-            return (T) Boolean.valueOf(mPreferences
-                    .getBoolean(mKey, (Boolean) mDefaultValue));
+            return (T) Boolean.valueOf(mPreferences.getBoolean(mKey, (Boolean) mDefaultValue));
         } else if (mDefaultValue instanceof Long) {
             return (T) Long.valueOf(mPreferences.getLong(mKey, (Long) mDefaultValue));
         } else {
