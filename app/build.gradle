@@ -61,7 +61,7 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
-    // material dialog
+        // material dialog
     compile 'com.github.afollestad.material-dialogs:core:0.9.0.1'
     compile 'com.github.afollestad.material-dialogs:commons:0.9.0.1'
     // butter knife
@@ -76,5 +76,6 @@ dependencies {
     // log
     compile 'com.github.zhaokaiqiang.klog:library:1.5.0'
     // auto parcel
-    apt 'frankiesardo:auto-parcel:{{1.0.3}}'
+    provided 'frankiesardo:auto-parcel:1.0.3'
+    apt 'frankiesardo:auto-parcel:1.0.3'
 }

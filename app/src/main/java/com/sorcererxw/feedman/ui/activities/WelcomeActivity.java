@@ -18,8 +18,8 @@ import com.sorcererxw.feedman.ui.fragments.base.BaseFragment;
 public class WelcomeActivity extends BaseFragmentActivity {
     @Override
     protected void init(Bundle saveInstance) {
-        if (FeedManApp.getPrefs(this).currentAccount.isContain()
-                && FeedManApp.getPrefs(this).currentAccount.getValue().length() > 0) {
+        if (FeedManApp.getPrefs(this).getCurrentAccount().isContain()
+                && FeedManApp.getPrefs(this).getCurrentAccount().getValue().length() > 0) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();

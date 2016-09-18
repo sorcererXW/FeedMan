@@ -11,6 +11,7 @@ import java.util.List;
  * @author: Sorcerer
  * @date: 2016/9/18
  */
+
 public class Entries {
     private BriteDatabase mDatabase;
 
@@ -21,7 +22,7 @@ public class Entries {
     public void addEntries(List<FeedlyEntry> entries) {
         BriteDatabase.Transaction transaction = mDatabase.newTransaction();
         for (FeedlyEntry entry:entries) {
-            mDatabase.insert(EntryTable.TABLE_NAME, entry.)
+//            mDatabase.insert(EntryTable.TABLE_NAME, entry.)
         }
     }
 }

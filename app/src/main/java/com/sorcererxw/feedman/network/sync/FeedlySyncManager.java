@@ -78,13 +78,16 @@ public class FeedlySyncManager extends SyncManager {
                                List<Subscription> oldSubscription,
                                List<Subscription> newSubscription) throws IOException {
         FeedlyClient.UnreadContentResponse unreadContentResponse = null;
-        do {
-            unreadContentResponse = mClient.getUnreadContent(fetchItemsNewerThan,
-                    unreadContentResponse != null ? unreadContentResponse.getContinuation() : null);
-
-        }
+//        do {
+//            unreadContentResponse = mClient.getUnreadContent(fetchItemsNewerThan,
+//                    unreadContentResponse != null ? unreadContentResponse.getContinuation() : null);
+//
+//        }while (1){
+//
+//        }
     }
 
     private List<Subscription> refreshSubscription() throws IOException {
+        return null;
     }
 }

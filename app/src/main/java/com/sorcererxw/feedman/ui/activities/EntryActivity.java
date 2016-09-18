@@ -53,7 +53,7 @@ public class EntryActivity extends BaseActivity {
 
         FeedlyClient client = new FeedlyClient(this,
                 FeedManApp.getDB(this).getAccounts()
-                        .getAccount(FeedManApp.getPrefs(this).currentAccount.getValue()));
+                        .getAccount(FeedManApp.getPrefs(this).getCurrentAccount().getValue()));
 
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(

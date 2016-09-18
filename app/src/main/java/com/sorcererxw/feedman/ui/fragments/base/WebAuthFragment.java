@@ -131,7 +131,7 @@ public abstract class WebAuthFragment extends BaseFragment {
 
     protected void addAccount(Account account) {
         Toast.makeText(getContext(), "has account", Toast.LENGTH_SHORT).show();
-        FeedManApp.getPrefs(getContext()).currentAccount.setValue(account.getId());
+        FeedManApp.getPrefs(getContext()).getCurrentAccount().setValue(account.getId());
         FeedManApp.getDB(getContext()).getAccounts().addAccount(account);
         Intent intent = new Intent(getHoldingActivity(), MainActivity.class);
         getHoldingActivity().startActivity(intent);

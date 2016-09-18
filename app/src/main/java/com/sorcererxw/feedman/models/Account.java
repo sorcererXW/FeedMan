@@ -107,11 +107,12 @@ public class Account {
 
     public static Account from(Cursor cursor) {
         Builder builder = new Builder()
-                .id(DB.getString(cursor, AccountTable.ID))
-                .label(DB.getString(cursor, AccountTable.LABEL));
+                .id(DB.DBContentGetter.getString(cursor, AccountTable.ID))
+                .label(DB.DBContentGetter.getString(cursor, AccountTable.LABEL));
         AccessToken accessToken = new AccessToken();
-        accessToken.setAccessToken(DB.getString(cursor, AccountTable.ACCESS_TOKEN));
-        accessToken.setRefreshToken(DB.getString(cursor, AccountTable.REFRESH_TOKEN));
+        accessToken.setAccessToken(DB.DBContentGetter.getString(cursor, AccountTable.ACCESS_TOKEN));
+        accessToken
+                .setRefreshToken(DB.DBContentGetter.getString(cursor, AccountTable.REFRESH_TOKEN));
         builder.accessToken(accessToken);
         return builder.build();
     }

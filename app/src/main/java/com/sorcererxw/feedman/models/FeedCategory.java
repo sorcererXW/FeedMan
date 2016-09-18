@@ -2,7 +2,9 @@ package com.sorcererxw.feedman.models;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.os.Parcelable;
 
+import com.google.auto.value.AutoValue;
 import com.sorcererxw.feedman.database.DB;
 import com.sorcererxw.feedman.database.tables.CategoryTable;
 import com.sorcererxw.feedman.database.tables.EntryTable;
@@ -12,29 +14,33 @@ import com.sorcererxw.feedman.database.tables.EntryTable;
  * @author: Sorcerer
  * @date: 2016/9/18
  */
-public class Category {
-    private String mAccountId;
-    private String mId;
-    private String mLabel;
-    private int mUnread;
+@AutoValue
+public abstract class FeedCategory implements Parcelable {
+    abstract String accountId();
+
+    abstract String id();
+
+    abstract String label();
+
+    abstract int unread();
 
     public ContentValues toContentValue() {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(CategoryTable.ID, mId);
-        contentValues.put(CategoryTable.ACCOUNT_ID, mAccountId);
-        contentValues.put(CategoryTable.LABEL, mLabel);
+        contentValues.put(CategoryTable.ID, id());
+        contentValues.put(CategoryTable.ACCOUNT_ID, accountId());
+        contentValues.put(CategoryTable.LABEL, label());
         return contentValues;
     }
 
-    public static Category from(String id, String accountId, String label) {
+    public static FeedCategory from(String id, String accountId, String label) {
         return from(id, accountId, label, 0);
     }
 
-    public static Category from(String id, String accountId, String label, int unread) {
-
+    public static FeedCategory from(String id, String accountId, String label, int unread) {
+        return new AutoValue_FeedCategory(id, accountId, label, unread);
     }
 
-    public static Category from(Cursor cursor) {
+    public static FeedCategory from(Cursor cursor) {
         return from(DB.DBContentGetter.getString(cursor, CategoryTable.ID),
                 DB.DBContentGetter.getString(cursor, CategoryTable.ACCOUNT_ID),
                 DB.DBContentGetter.getString(cursor, CategoryTable.LABEL),

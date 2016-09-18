@@ -67,7 +67,7 @@ public class FeedFragment extends BaseFragment {
 
         FeedlyClient client = new FeedlyClient(getContext(),
                 FeedManApp.getDB(getContext()).getAccounts()
-                        .getAccount(FeedManApp.getPrefs(getContext()).currentAccount.getValue()));
+                        .getAccount(FeedManApp.getPrefs(getContext()).getCurrentAccount().getValue()));
 
         client.getSubscriptions()
                 .subscribeOn(Schedulers.io())
