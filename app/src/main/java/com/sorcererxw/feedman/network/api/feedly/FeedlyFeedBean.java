@@ -1,4 +1,4 @@
-package com.sorcererxw.feedman.api.feedly;
+package com.sorcererxw.feedman.network.api.feedly;
 
 import android.os.Parcel;
 import android.os.Parcelable;

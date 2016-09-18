@@ -7,8 +7,9 @@ import android.view.View;
 
 import com.sorcererxw.feedman.FeedManApp;
 import com.sorcererxw.feedman.R;
-import com.sorcererxw.feedman.api.feedly.FeedlyClient;
-import com.sorcererxw.feedman.api.feedly.FeedlySubscription;
+import com.sorcererxw.feedman.network.api.feedly.FeedlyClient;
+import com.sorcererxw.feedman.network.api.feedly.FeedlySubscription;
+import com.sorcererxw.feedman.ui.activities.EntryActivity;
 import com.sorcererxw.feedman.ui.adapters.BaseTextAdapter;
 import com.sorcererxw.feedman.ui.fragments.base.BaseFragment;
 
@@ -56,8 +57,9 @@ public class FeedFragment extends BaseFragment {
                 new BaseTextAdapter.OnItemClickListener<FeedlySubscription>() {
                     @Override
                     public void onItemClick(FeedlySubscription feedlySubscription) {
-                        FeedFragment.this
-                                .addFragment(EntryFragment.newInstance(feedlySubscription.getId()));
+                        EntryActivity.startActivity(getContext(), feedlySubscription.getId());
+//                        FeedFragment.this
+//                                .addFragment(EntryFragment.newInstance(feedlySubscription.getId()));
                     }
                 });
 

@@ -1,7 +1,5 @@
 package com.sorcererxw.feedman.database.tables;
 
-import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.sorcererxw.feedman.database.TableBuilder;
@@ -9,33 +7,31 @@ import com.sorcererxw.feedman.database.TableBuilder;
 /**
  * @description:
  * @author: Sorcerer
- * @date: 2016/9/13
+ * @date: 2016/9/15
  */
-public class AccountTable {
-    public static final String ACCESS_TOKEN = "access_token";
+public class SubscriptionTable {
+    public static final String ACCOUNT_ID = "account_id";
     public static final String ID = "id";
-    public static final String LABEL = "label";
-    public static final String REFRESH_TOKEN = "refresh_token";
-    public static final String TABLE_NAME = "account";
-    public static final String TYPE = "type";
+    public static final String TABLE_NAME = "subscription";
+    public static final String TITLE = "title";
+    public static final String VISUAL_URL = "visual_url";
+    public static final String WEBSITE = "website";
 
     public static void onCreate(SQLiteDatabase db) {
         db.execSQL(new TableBuilder(TABLE_NAME)
                 .addTextColumns(TableBuilder.FLAG_NOT_NULL,
                         ID,
-                        ACCESS_TOKEN)
+                        ACCOUNT_ID,
+                        TITLE)
                 .addTextColumns(
-                        LABEL,
-                        REFRESH_TOKEN)
-                .addIntegerColumn(
-                        TYPE)
+                        WEBSITE,
+                        VISUAL_URL)
                 .addPrimaryKeys(
                         ID,
-                        TYPE)
+                        ACCOUNT_ID)
                 .build());
     }
 
     public static void onUpdate(SQLiteDatabase db, int oldVersion, int newVersion) {
-
     }
 }

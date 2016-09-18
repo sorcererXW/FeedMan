@@ -1,5 +1,6 @@
 package com.sorcererxw.feedman.ui.activities.base;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -16,11 +17,16 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected abstract void init(Bundle saveInstance);
 
+    protected void handleIntent(Intent intent) {
+
+    }
+
     @Override
     protected void onCreate(Bundle saveInstance) {
         super.onCreate(saveInstance);
         setContentView(getContentViewId());
         ButterKnife.bind(this);
+        handleIntent(getIntent());
         init(saveInstance);
     }
 }

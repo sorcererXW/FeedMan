@@ -1,68 +1,65 @@
-package com.sorcererxw.feedman.ui.fragments;
+package com.sorcererxw.feedman.ui.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 
+import com.socks.library.KLog;
 import com.sorcererxw.feedman.FeedManApp;
 import com.sorcererxw.feedman.R;
 import com.sorcererxw.feedman.network.api.feedly.FeedlyClient;
 import com.sorcererxw.feedman.network.api.feedly.FeedlyEntry;
 import com.sorcererxw.feedman.network.api.feedly.FeedlyStream;
+import com.sorcererxw.feedman.ui.activities.base.BaseActivity;
 import com.sorcererxw.feedman.ui.adapters.BaseTextAdapter;
-import com.sorcererxw.feedman.ui.fragments.base.BaseFragment;
 
 import butterknife.BindView;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-/**
- * @description:
- * @author: Sorcerer
- * @date: 2016/9/12
- */
-public class EntryFragment extends BaseFragment {
+public class EntryActivity extends BaseActivity {
 
-    private static final String KEY_FEED_ID = "key-feed-id";
+    private static final String KEY_FEED_ID = "key_feed_id";
 
-    public static EntryFragment newInstance(String feedId) {
-        Bundle bundle = new Bundle();
-        bundle.putString(KEY_FEED_ID, feedId);
-        EntryFragment fragment = new EntryFragment();
-        fragment.setArguments(bundle);
-        return fragment;
+    public static void startActivity(Context context, String feedId) {
+        Intent intent = new Intent(context, EntryActivity.class);
+        intent.putExtra(KEY_FEED_ID, feedId);
+        context.startActivity(intent);
     }
 
-    private String mFeedID;
+    @BindView(R.id.recyclerView_activity_entry_list)
+    RecyclerView mRecyclerView;
 
-    public EntryFragment() {
+    private String mFeedId;
+
+    @Override
+    protected void handleIntent(Intent intent) {
+        super.handleIntent(intent);
+        mFeedId = intent.getStringExtra(KEY_FEED_ID);
     }
 
     @Override
-    protected int getLayoutId() {
-        return R.layout.fragment_entry;
+    protected int getContentViewId() {
+        return R.layout.activity_entry;
     }
-
-    @BindView(R.id.recyclerView_fragment_entry_list)
-    RecyclerView mRecyclerView;
 
     private BaseTextAdapter<FeedlyEntry> mAdapter;
 
     @Override
-    protected void init(View view, Bundle saveInstance) {
-        mFeedID = getArguments().getString(KEY_FEED_ID);
+    protected void init(Bundle saveInstance) {
 
-        FeedlyClient client = new FeedlyClient(getContext(),
-                FeedManApp.getDB(getContext()).getAccounts()
-                        .getAccount(FeedManApp.getPrefs(getContext()).currentAccount.getValue()));
+        FeedlyClient client = new FeedlyClient(this,
+                FeedManApp.getDB(this).getAccounts()
+                        .getAccount(FeedManApp.getPrefs(this).currentAccount.getValue()));
 
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(
-                new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        mAdapter = new BaseTextAdapter<FeedlyEntry>(getContext()) {
+        mAdapter = new BaseTextAdapter<FeedlyEntry>(this) {
             @Override
             protected String convert(FeedlyEntry bean) {
                 return bean.getTitle();
@@ -73,9 +70,16 @@ public class EntryFragment extends BaseFragment {
                 return bean.isUnread();
             }
         };
+        mAdapter.setOnItemClickListener(new BaseTextAdapter.OnItemClickListener<FeedlyEntry>() {
+            @Override
+            public void onItemClick(FeedlyEntry entry) {
+                KLog.d(entry.toString());
+//                  ContentActivity.startActivity(EntryActivity.this, entry);
+            }
+        });
         mRecyclerView.setAdapter(mAdapter);
 
-        client.getFeedSteam(mFeedID, 20, false)
+        client.getFeedSteam(mFeedId, 20, false)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<FeedlyStream>() {

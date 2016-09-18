@@ -6,6 +6,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.sorcererxw.feedman.database.tables.AccountTable;
+import com.sorcererxw.feedman.database.tables.CategoryTable;
+import com.sorcererxw.feedman.database.tables.EntryTable;
+import com.sorcererxw.feedman.database.tables.SubscriptionTable;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -17,8 +20,12 @@ import java.lang.reflect.InvocationTargetException;
 public class DBOpenHelper extends SQLiteOpenHelper {
 
     private static final int VERSION = 4;
-    private static final Class[] tables =
-            new Class[]{AccountTable.class};
+    private static final Class[] tables = new Class[]{
+            AccountTable.class,
+            CategoryTable.class,
+            EntryTable.class,
+            SubscriptionTable.class
+    };
 
     public DBOpenHelper(Context context) {
         this(context, "FeedMan.db", null, VERSION);

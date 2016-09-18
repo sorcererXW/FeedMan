@@ -1,4 +1,4 @@
-package com.sorcererxw.feedman.api.feedly;
+package com.sorcererxw.feedman.network.api.feedly;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -45,7 +45,7 @@ public class FeedlyEntry {
      */
 
     @SerializedName("content")
-    private ContentBean mContent;
+    private FeedlyEntryContent mContent;
     @SerializedName("updated")
     private long mUpdated;
     @SerializedName("unread")
@@ -57,7 +57,7 @@ public class FeedlyEntry {
      */
 
     @SerializedName("origin")
-    private OriginBean mOrigin;
+    private FeedlyEntryOrigin mOrigin;
     /**
      * id : user/c805fcbf-3acf-4302-a97e-d82f9d7c897f/tag/inspiration
      * label : inspiration
@@ -128,11 +128,11 @@ public class FeedlyEntry {
         mId = id;
     }
 
-    public ContentBean getContent() {
+    public FeedlyEntryContent getContent() {
         return mContent;
     }
 
-    public void setContent(ContentBean content) {
+    public void setContent(FeedlyEntryContent content) {
         mContent = content;
     }
 
@@ -152,11 +152,11 @@ public class FeedlyEntry {
         mUnread = unread;
     }
 
-    public OriginBean getOrigin() {
+    public FeedlyEntryOrigin getOrigin() {
         return mOrigin;
     }
 
-    public void setOrigin(OriginBean origin) {
+    public void setOrigin(FeedlyEntryOrigin origin) {
         mOrigin = origin;
     }
 
@@ -182,62 +182,6 @@ public class FeedlyEntry {
 
     public void setCategories(List<CategoriesBean> categories) {
         mCategories = categories;
-    }
-
-    public static class ContentBean {
-        @SerializedName("direction")
-        private String mDirection;
-        @SerializedName("content")
-        private String mContent;
-
-        public String getDirection() {
-            return mDirection;
-        }
-
-        public void setDirection(String direction) {
-            mDirection = direction;
-        }
-
-        public String getContent() {
-            return mContent;
-        }
-
-        public void setContent(String content) {
-            mContent = content;
-        }
-    }
-
-    public static class OriginBean {
-        @SerializedName("title")
-        private String mTitle;
-        @SerializedName("htmlUrl")
-        private String mHtmlUrl;
-        @SerializedName("streamId")
-        private String mStreamId;
-
-        public String getTitle() {
-            return mTitle;
-        }
-
-        public void setTitle(String title) {
-            mTitle = title;
-        }
-
-        public String getHtmlUrl() {
-            return mHtmlUrl;
-        }
-
-        public void setHtmlUrl(String htmlUrl) {
-            mHtmlUrl = htmlUrl;
-        }
-
-        public String getStreamId() {
-            return mStreamId;
-        }
-
-        public void setStreamId(String streamId) {
-            mStreamId = streamId;
-        }
     }
 
     public static class TagsBean {
@@ -308,4 +252,29 @@ public class FeedlyEntry {
             mLabel = label;
         }
     }
+
+
+    public FeedlyEntry() {
+    }
+
+
+    @Override
+    public String toString() {
+        return "FeedlyEntry{" +
+                "\nmEngagement=" + mEngagement +
+                "\n, mPublished=" + mPublished +
+                "\n, mCrawled=" + mCrawled +
+                "\n, mTitle='" + mTitle + '\'' +
+                "\n, mAuthor='" + mAuthor + '\'' +
+                "\n, mId='" + mId + '\'' +
+                "\n, mContent=" + mContent +
+                "\n, mUpdated=" + mUpdated +
+                "\n, mUnread=" + mUnread +
+                "\n, mOrigin=" + mOrigin +
+                "\n, mTags=" + mTags +
+                "\n, mAlternate=" + mAlternate +
+                "\n, mCategories=" + mCategories +
+                "\n}";
+    }
 }
+

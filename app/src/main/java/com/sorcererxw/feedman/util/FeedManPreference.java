@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 
 import com.socks.library.KLog;
 
+import java.util.Date;
+
 /**
  * @description:
  * @author: Sorcerer
@@ -17,7 +19,8 @@ public class FeedManPreference<T> {
     private String mKey;
     private SharedPreferences mPreferences;
 
-    public FeedManPreference(SharedPreferences sharedPreferences, String key,@NonNull T defaultValue) {
+    public FeedManPreference(SharedPreferences sharedPreferences, String key,
+                             @NonNull T defaultValue) {
         mDefaultValue = defaultValue;
         mKey = key;
         mPreferences = sharedPreferences;
@@ -34,6 +37,9 @@ public class FeedManPreference<T> {
             return (T) Boolean.valueOf(mPreferences.getBoolean(mKey, (Boolean) mDefaultValue));
         } else if (mDefaultValue instanceof Long) {
             return (T) Long.valueOf(mPreferences.getLong(mKey, (Long) mDefaultValue));
+        } else if (mDefaultValue instanceof Date) {
+            Long time = mPreferences.getLong(mKey, ((Date) mDefaultValue).getTime());
+            return (T) new Date(time);
         } else {
             throw new IllegalArgumentException(
                     "Preference type not implemented " + mDefaultValue.getClass());
@@ -52,6 +58,8 @@ public class FeedManPreference<T> {
             editor.putBoolean(mKey, (Boolean) value);
         } else if (value instanceof Long) {
             editor.putLong(mKey, (Long) value);
+        } else if (value instanceof Date) {
+            editor.putLong(mKey, ((Date) value).getTime());
         } else {
             throw new IllegalArgumentException(
                     "Preference type not implemented " + value.getClass());

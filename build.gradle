@@ -24,6 +24,7 @@ allprojects {
             url "http://mvn.leancloud.cn/nexus/content/repositories/releases"
         }
         maven { url "https://raw.github.com/bmob/bmob-android-sdk/master" }
+        maven { url "https://clojars.org/repo/" }
     }
     apply plugin: 'checkstyle'
     task checkstyle(type: Checkstyle) {

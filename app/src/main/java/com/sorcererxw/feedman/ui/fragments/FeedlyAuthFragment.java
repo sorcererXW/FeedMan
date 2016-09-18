@@ -3,9 +3,8 @@ package com.sorcererxw.feedman.ui.fragments;
 import android.content.Context;
 
 import com.socks.library.KLog;
-import com.sorcererxw.feedman.models.AccessToken;
 import com.sorcererxw.feedman.models.Account;
-import com.sorcererxw.feedman.api.feedly.FeedlyClient;
+import com.sorcererxw.feedman.network.api.feedly.FeedlyClient;
 import com.sorcererxw.feedman.ui.fragments.base.WebAuthFragment;
 
 import rx.Observable;

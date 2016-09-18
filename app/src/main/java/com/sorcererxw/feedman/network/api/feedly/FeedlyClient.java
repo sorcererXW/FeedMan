@@ -1,4 +1,4 @@
-package com.sorcererxw.feedman.api.feedly;
+package com.sorcererxw.feedman.network.api.feedly;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -7,17 +7,20 @@ import com.socks.library.KLog;
 import com.sorcererxw.feedman.R;
 import com.sorcererxw.feedman.models.AccessToken;
 import com.sorcererxw.feedman.models.Account;
+import com.sorcererxw.feedman.util.NetworkUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
+import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Path;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -59,7 +62,7 @@ public class FeedlyClient {
                 .client(new OkHttpClient.Builder().addInterceptor(
                         new Interceptor() {
                             @Override
-                            public Response intercept(Chain chain) throws IOException {
+                            public okhttp3.Response intercept(Chain chain) throws IOException {
                                 Request request = chain.request();
                                 if (mAccessToken != null) {
                                     request = request.newBuilder()
@@ -139,4 +142,86 @@ public class FeedlyClient {
     public Observable<FeedlyStream> getFeedSteam(String streamId, int count, boolean unreadOnly) {
         return mFeedlyService.getFeedStream(streamId, count, unreadOnly);
     }
+
+    public static class UnreadContentResponse {
+        private final String mContinuation;
+        private final List<FeedlyEntry> mEntries;
+
+        public UnreadContentResponse(List<FeedlyEntry> entries, String continuation) {
+            mContinuation = continuation;
+            mEntries = entries;
+        }
+
+        public String getContinuation() {
+            return mContinuation;
+        }
+
+        public List<FeedlyEntry> getEntries() {
+            return mEntries;
+        }
+    }
+
+    public UnreadContentResponse getUnreadContent(long newerThan, String continuation)
+            throws IOException {
+        Call<FeedlyStream> call;
+        String id = "/user/" + mAccount.getId() + "/category/global.all";
+        List<FeedlyEntry> entryList = new ArrayList<>();
+        if (continuation != null) {
+            if (newerThan > 0) {
+                call = mFeedlyService.getFeedStreamCall(id, 400, true, newerThan, continuation);
+            } else {
+                call = mFeedlyService.getFeedStreamCall(id, 400, true, continuation);
+            }
+        } else {
+            if (newerThan > 0) {
+                call = mFeedlyService.getFeedStreamCall(id, 400, true, newerThan);
+            } else {
+                call = mFeedlyService.getFeedStreamCall(id, 400, true);
+            }
+        }
+        FeedlyStream stream = NetworkUtil.executeApiCall(call);
+        for (FeedlyEntry entry : stream.getItems()) {
+            entryList.add(entry);
+        }
+        return new UnreadContentResponse(entryList, stream.getContinuation());
+    }
+
+    public Observable<String[]> markAsRead(List<String> entryIds) {
+        return updateReadStatus(FeedlyReadMarker.read((String[]) entryIds.toArray()));
+    }
+
+    public Observable<String[]> markAsUnread(List<String> entryIds) {
+        return updateReadStatus(FeedlyReadMarker.unread((String[]) entryIds.toArray()));
+    }
+
+    private Observable<String[]> updateReadStatus(final FeedlyReadMarker marker) {
+        return mFeedlyService.updateEntriesStatus(marker)
+                .flatMap(new Func1<Void, Observable<String[]>>() {
+                    @Override
+                    public Observable<String[]> call(Void aVoid) {
+                        return Observable.just(marker.getEntryIds());
+                    }
+                });
+    }
+
+    public Observable<String> markAsStarred(final String entryId) {
+        return mFeedlyService.updateEntriesStatus(FeedlyReadMarker.starred(entryId))
+                .flatMap(new Func1<Void, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(Void aVoid) {
+                        return Observable.just(entryId);
+                    }
+                });
+    }
+
+    public Observable<String> markAsUnstarred(final String entryId) {
+        return mFeedlyService.updateEntriesStatus(FeedlyReadMarker.unstarred(entryId))
+                .flatMap(new Func1<Void, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(Void aVoid) {
+                        return Observable.just(entryId);
+                    }
+                });
+    }
+
 }

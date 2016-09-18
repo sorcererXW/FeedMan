@@ -22,6 +22,8 @@
         <activity android:name=".ui.activities.MainActivity"/>
         <activity android:name=".ui.activities.ContentActivity"/>
         <activity android:name=".ui.activities.AuthActivity"/>
+        <activity android:name=".ui.activities.EntryActivity">
+        </activity>
     </application>
 
 </manifest>

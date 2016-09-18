@@ -6,8 +6,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.sorcererxw.feedman.R;
-import com.sorcererxw.feedman.api.feedly.FeedlyService;
-import com.sorcererxw.feedman.api.feedly.FeedlyServiceProvider;
+import com.sorcererxw.feedman.network.api.feedly.FeedlyService;
+import com.sorcererxw.feedman.network.api.feedly.FeedlyServiceProvider;
 import com.sorcererxw.feedman.ui.activities.base.BaseActivity;
 
 import butterknife.BindView;

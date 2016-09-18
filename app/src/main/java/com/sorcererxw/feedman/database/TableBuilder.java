@@ -31,12 +31,30 @@ public class TableBuilder {
         mTableName = tableName;
     }
 
+    // text
+    public TableBuilder addTextColumns(int flags, String... columnNames) {
+        return addColumns(TYPE_TEXT, flags, columnNames);
+    }
+
+    public TableBuilder addTextColumns(String... columnNames) {
+        return addColumns(TYPE_TEXT, columnNames);
+    }
+
     public TableBuilder addTextColumn(String columnName) {
         return addColumn(columnName, TYPE_TEXT, 0);
     }
 
     public TableBuilder addTextColumn(String columnName, int flags) {
         return addColumn(columnName, TYPE_TEXT, flags);
+    }
+
+    // integer
+    public TableBuilder addIntegerColumns(int flags, String... columnNames) {
+        return addColumns(TYPE_INTEGER, flags, columnNames);
+    }
+
+    public TableBuilder addIntegerColumns(String... columnNames) {
+        return addColumns(TYPE_INTEGER, columnNames);
     }
 
     public TableBuilder addIntegerColumn(String columnName) {
@@ -47,12 +65,36 @@ public class TableBuilder {
         return addColumn(columnName, TYPE_INTEGER, flags);
     }
 
+    // boolean
+    public TableBuilder addBooleanColumns(int flags, String... columnNames) {
+        return addColumns(TYPE_BOOL, flags, columnNames);
+    }
+
+    public TableBuilder addBooleanColumns(String... columnNames) {
+        return addColumns(TYPE_BOOL, columnNames);
+    }
+
     public TableBuilder addBooleanColumn(String columnName) {
         return addColumn(columnName, TYPE_BOOL, 0);
     }
 
     public TableBuilder addBooleanColumn(String columnName, int flags) {
         return addColumn(columnName, TYPE_INTEGER, flags);
+    }
+
+    // base
+    public TableBuilder addColumns(String type, int flags, String... columnNames) {
+        for (String name : columnNames) {
+            addColumns(type, flags, name);
+        }
+        return this;
+    }
+
+    public TableBuilder addColumns(String type, String... columnNames) {
+        for (String name : columnNames) {
+            addColumn(name, type, 0);
+        }
+        return this;
     }
 
     public TableBuilder addColumn(String columnName, String type) {
@@ -82,6 +124,7 @@ public class TableBuilder {
         return this;
     }
 
+    // primary
     private List<String> mPrimaryKeyList = new ArrayList<>();
 
     public TableBuilder addPrimaryKeys(String... columnNames) {
@@ -89,6 +132,7 @@ public class TableBuilder {
         return this;
     }
 
+    // foreign
     private List<String> mForeignKeyList = new ArrayList<>();
 
     public TableBuilder addForeignKey(String columnName,
@@ -105,6 +149,7 @@ public class TableBuilder {
         return this;
     }
 
+    // unique
     private List<String> mUniqueColumnList = new ArrayList<>();
 
     public TableBuilder addUniqueColumns(String... columnNames) {
