@@ -26,6 +26,7 @@ public class FeedManPreference<T> {
         mPreferences = sharedPreferences;
     }
 
+    @SuppressWarnings("unchecked")
     public T getValue() {
         if (mDefaultValue instanceof String) {
             return (T) mPreferences.getString(mKey, (String) mDefaultValue);

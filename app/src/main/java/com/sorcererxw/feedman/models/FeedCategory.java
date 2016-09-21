@@ -41,10 +41,10 @@ public abstract class FeedCategory implements Parcelable {
     }
 
     public static FeedCategory from(Cursor cursor) {
-        return from(DB.DBContentGetter.getString(cursor, CategoryTable.ID),
-                DB.DBContentGetter.getString(cursor, CategoryTable.ACCOUNT_ID),
-                DB.DBContentGetter.getString(cursor, CategoryTable.LABEL),
-                DB.DBContentGetter.getInt(cursor, EntryTable.UNREAD, 0)
+        return from(DB.Getter.getString(cursor, CategoryTable.ID),
+                DB.Getter.getString(cursor, CategoryTable.ACCOUNT_ID),
+                DB.Getter.getString(cursor, CategoryTable.LABEL),
+                DB.Getter.getInt(cursor, EntryTable.UNREAD, 0)
         );
     }
 }

@@ -17,6 +17,9 @@ import rx.schedulers.Schedulers;
  * @date: 2016/9/13
  */
 public class DB {
+    public static final String SUBSCRIPTION_TITLE_ALIAS = "subscription_title";
+    public static final String SUBSCRIPTION_VISUAL_URL_ALIAS = "subscription_visual_url";
+
     private Context mContext;
 
     private BriteDatabase mDatabase;
@@ -28,19 +31,25 @@ public class DB {
         mDatabase.setLoggingEnabled(BuildConfig.DEBUG);
 
         mAccounts = new Accounts(mDatabase);
+        mEntries = new Entries(mDatabase);
     }
 
     private Accounts mAccounts;
+    private Entries mEntries;
 
     public Accounts getAccounts() {
         return mAccounts;
+    }
+
+    public Entries getEntries() {
+        return mEntries;
     }
 
     public BriteDatabase.Transaction newTransaction() {
         return mDatabase.newTransaction();
     }
 
-    public static class DBContentGetter{
+    public static class Getter {
         public static String getString(Cursor cursor, String columnName) {
             return cursor.getString(cursor.getColumnIndex(columnName));
         }

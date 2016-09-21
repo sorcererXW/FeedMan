@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.google.auto.value.AutoValue;
+import com.sorcererxw.feedman.database.DB;
 import com.sorcererxw.feedman.database.tables.SubscriptionTable;
 
 import java.util.List;
@@ -49,26 +50,28 @@ public abstract class FeedSubscription implements Parcelable {
 
     public static FeedSubscription from(Cursor cursor) {
         return builder()
-
+                .accountId(DB.Getter.getString(cursor, SubscriptionTable.ACCOUNT_ID))
+                .id(DB.Getter.getString(cursor, SubscriptionTable.ID))
+                .title(DB.Getter.getString(cursor, SubscriptionTable.TITLE))
+                .visualUrl(DB.Getter.getString(cursor, SubscriptionTable.VISUAL_URL))
+                .website(DB.Getter.getString(cursor, SubscriptionTable.WEBSITE))
                 .build();
     }
 
     @AutoValue.Builder
     public static abstract class Builder {
-        public abstract Builder accountId(String str);
+        public abstract Builder accountId(String accountId);
 
         public abstract FeedSubscription build();
 
-        public abstract Builder categories(List<FeedCategory> list);
+        public abstract Builder id(String id);
 
-        public abstract Builder id(String str);
+        public abstract Builder title(String title);
 
-        public abstract Builder title(String str);
+        public abstract Builder unread(int unread);
 
-        public abstract Builder unread(int i);
+        public abstract Builder visualUrl(String visualUrl);
 
-        public abstract Builder visualUrl(String str);
-
-        public abstract Builder website(String str);
+        public abstract Builder website(String website);
     }
 }

@@ -49,7 +49,7 @@ public class ContentActivity extends BaseActivity {
         if (mFeedlyEntry == null || mFeedlyEntry.getContent() == null) {
             finish();
         }
-        mContent.setText(Html.fromHtml(mFeedlyEntry.getContent().getContent()));
+        mContent.setText(Html.fromHtml(mFeedlyEntry.getContent()));
 
     }
 }

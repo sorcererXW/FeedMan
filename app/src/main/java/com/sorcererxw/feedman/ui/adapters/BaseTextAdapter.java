@@ -29,7 +29,7 @@ public abstract class BaseTextAdapter<E>
         @BindView(R.id.textView_base_text_content)
         TextView content;
 
-        public BaseTextViewHolder(View itemView) {
+        BaseTextViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
