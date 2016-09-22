@@ -1,11 +1,7 @@
 package com.sorcererxw.feedman.util;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
-
-import com.socks.library.KLog;
 
 import java.util.Date;
 

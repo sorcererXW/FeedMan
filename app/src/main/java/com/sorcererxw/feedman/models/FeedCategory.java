@@ -16,13 +16,13 @@ import com.sorcererxw.feedman.database.tables.EntryTable;
  */
 @AutoValue
 public abstract class FeedCategory implements Parcelable {
-    abstract String accountId();
+    public abstract String accountId();
 
-    abstract String id();
+    public abstract String id();
 
-    abstract String label();
+    public abstract String label();
 
-    abstract int unread();
+    public abstract int unread();
 
     public ContentValues toContentValue() {
         ContentValues contentValues = new ContentValues();
