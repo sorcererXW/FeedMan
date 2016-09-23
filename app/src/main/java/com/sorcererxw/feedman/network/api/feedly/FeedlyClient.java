@@ -5,8 +5,19 @@ import android.text.TextUtils;
 
 import com.socks.library.KLog;
 import com.sorcererxw.feedman.R;
+import com.sorcererxw.feedman.database.tables.AccountTable;
 import com.sorcererxw.feedman.models.AccessToken;
 import com.sorcererxw.feedman.models.Account;
+import com.sorcererxw.feedman.models.FeedCategory;
+import com.sorcererxw.feedman.models.FeedEntry;
+import com.sorcererxw.feedman.models.FeedSubscription;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyAccessToken;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyCategory;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyEntry;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyProfile;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyReadMarker;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyStream;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlySubscription;
 import com.sorcererxw.feedman.util.NetworkUtil;
 
 import java.io.IOException;
@@ -20,7 +31,6 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Path;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -52,7 +62,7 @@ public class FeedlyClient {
 
         if (account != null) {
             mAccount = account;
-            mAccessToken = account.getAccessToken();
+            mAccessToken = account.accessToken();
         }
 
         mFeedlyService = new Retrofit.Builder()
@@ -67,7 +77,7 @@ public class FeedlyClient {
                                 if (mAccessToken != null) {
                                     request = request.newBuilder()
                                             .addHeader("Authorization",
-                                                    "OAuth " + mAccessToken.getAccessToken())
+                                                    "OAuth " + mAccessToken.accessToken())
                                             .build();
                                 }
                                 return chain.proceed(request);
@@ -95,11 +105,11 @@ public class FeedlyClient {
                 mAuthRedirectUrl,
                 "authorization_code"
         )
-                .flatMap(new Func1<AccessToken, Observable<FeedlyProfile>>() {
+                .flatMap(new Func1<FeedlyAccessToken, Observable<FeedlyProfile>>() {
                     @Override
-                    public Observable<FeedlyProfile> call(AccessToken token) {
+                    public Observable<FeedlyProfile> call(FeedlyAccessToken token) {
                         KLog.d(token.toString());
-                        mAccessToken = token;
+                        mAccessToken = AccessToken.from(token);
                         return mFeedlyService.getProfile();
                     }
                 })
@@ -115,39 +125,58 @@ public class FeedlyClient {
                                 accountLabel = "@" + profile.getTwitter();
                             }
                         }
-                        mAccount = new Account.Builder()
-                                .accessToken(mAccessToken)
-                                .id(profile.getId())
-                                .label(accountLabel)
-                                .build();
+                        mAccount = Account.from(mAccessToken, profile.getId(), accountLabel);
                         return Observable.just(mAccount);
                     }
                 });
     }
 
-    public Observable<AccessToken> authenticateTest(String authenticationCode) {
-        return mFeedlyService.getAccessToken(
-                authenticationCode,
-                mClientId,
-                mClientSecret,
-                mAuthRedirectUrl,
-                "authorization_code"
-        );
+    public AccessToken refreshAccessToken(AccessToken currentAccessToken) throws IOException {
+        return AccessToken.from(
+                NetworkUtil.executeApiCall(mFeedlyService.refreshAccessTokenCall(
+                        currentAccessToken.refreshToken(),
+                        mClientId,
+                        mClientSecret,
+                        AccountTable.REFRESH_TOKEN)).getAccessToken(),
+                currentAccessToken.refreshToken());
     }
 
-    public Observable<List<FeedlySubscription>> getSubscriptions() {
-        return mFeedlyService.getSubscriptions();
+    public List<FeedCategory> getCategory() throws IOException {
+        List<FeedCategory> categoryList = new ArrayList<>();
+        for (FeedlyCategory feedlyCategory :
+                NetworkUtil.executeApiCall(mFeedlyService.getCategories())) {
+            categoryList.add(FeedCategory.from(mAccount, feedlyCategory));
+        }
+        return categoryList;
     }
 
-    public Observable<FeedlyStream> getFeedSteam(String streamId, int count, boolean unreadOnly) {
+    public Observable<List<FeedSubscription>> getSubscriptions() {
+        return mFeedlyService.getSubscriptions().flatMapIterable(
+                new Func1<List<FeedlySubscription>, Iterable<FeedlySubscription>>() {
+                    @Override
+                    public Iterable<FeedlySubscription> call(
+                            List<FeedlySubscription> feedlySubscriptions) {
+                        return feedlySubscriptions;
+                    }
+                })
+                .map(new Func1<FeedlySubscription, FeedSubscription>() {
+                    @Override
+                    public FeedSubscription call(FeedlySubscription feedlySubscription) {
+                        return FeedSubscription.from(mAccount, feedlySubscription);
+                    }
+                })
+                .toList();
+    }
+
+    public Observable<FeedlyStream> getFeedStream(String streamId, int count, boolean unreadOnly) {
         return mFeedlyService.getFeedStream(streamId, count, unreadOnly);
     }
 
     public static class UnreadContentResponse {
         private final String mContinuation;
-        private final List<FeedlyEntry> mEntries;
+        private final List<FeedEntry> mEntries;
 
-        public UnreadContentResponse(List<FeedlyEntry> entries, String continuation) {
+        public UnreadContentResponse(List<FeedEntry> entries, String continuation) {
             mContinuation = continuation;
             mEntries = entries;
         }
@@ -156,7 +185,7 @@ public class FeedlyClient {
             return mContinuation;
         }
 
-        public List<FeedlyEntry> getEntries() {
+        public List<FeedEntry> getEntries() {
             return mEntries;
         }
     }
@@ -164,8 +193,8 @@ public class FeedlyClient {
     public UnreadContentResponse getUnreadContent(long newerThan, String continuation)
             throws IOException {
         Call<FeedlyStream> call;
-        String id = "/user/" + mAccount.getId() + "/category/global.all";
-        List<FeedlyEntry> entryList = new ArrayList<>();
+        String id = "/user/" + mAccount.id() + "/category/global.all";
+        List<FeedEntry> entryList = new ArrayList<>();
         if (continuation != null) {
             if (newerThan > 0) {
                 call = mFeedlyService.getFeedStreamCall(id, 400, true, newerThan, continuation);
@@ -181,9 +210,65 @@ public class FeedlyClient {
         }
         FeedlyStream stream = NetworkUtil.executeApiCall(call);
         for (FeedlyEntry entry : stream.getItems()) {
-            entryList.add(entry);
+            entryList.add(FeedEntry.builder(entry).accountId(mAccount.id()).build());
         }
         return new UnreadContentResponse(entryList, stream.getContinuation());
+    }
+
+    public List<FeedEntry> getSubscriptionContent(String subscriptionId, long newerThan)
+            throws IOException {
+        List<FeedEntry> result = new ArrayList<>();
+        FeedlyStream stream = null;
+        do {
+            Call<FeedlyStream> call;
+            if (stream == null || stream.getContinuation() == null) {
+                if (newerThan > 0) {
+                    call = mFeedlyService.getFeedStreamCall(subscriptionId, 400, true, newerThan);
+                } else {
+                    call = mFeedlyService.getFeedStreamCall(subscriptionId, 400, true);
+                }
+            } else if (newerThan > 0) {
+                call = mFeedlyService.getFeedStreamCall(subscriptionId, 400, true, newerThan,
+                        stream.getContinuation());
+            } else {
+                call = mFeedlyService.getFeedStreamCall(subscriptionId, 400, true,
+                        stream.getContinuation());
+            }
+            stream = NetworkUtil.executeApiCall(call);
+            for (FeedlyEntry entry : stream.getItems()) {
+                result.add(FeedEntry.builder(entry)
+                        .accountId(mAccount.id())
+                        .subscriptionId(subscriptionId)
+                        .build());
+            }
+            if (stream.getContinuation() == null) {
+                break;
+            }
+        } while (result.size() < 400);
+        return result;
+    }
+
+    public List<FeedEntry> getSavedEntries() throws IOException {
+        String streamId = "/user/" + mAccount.id() + "/tag/global.saved";
+        FeedlyStream stream = null;
+        List<FeedEntry> result = new ArrayList<>();
+        do {
+            Call<FeedlyStream> call;
+            if (stream == null || stream.getContinuation() == null) {
+                call = mFeedlyService.getFeedStreamCall(streamId, 10000, false);
+            } else {
+                call = mFeedlyService.getFeedStreamCall(streamId, 10000, false,
+                        stream.getContinuation());
+            }
+            stream = NetworkUtil.executeApiCall(call);
+            for (FeedlyEntry entry : stream.getItems()) {
+                result.add(FeedEntry.builder(entry)
+                        .accountId(mAccount.id())
+                        .starred(true)
+                        .build());
+            }
+        } while (stream.getContinuation() != null);
+        return result;
     }
 
     public Observable<String[]> markAsRead(List<String> entryIds) {

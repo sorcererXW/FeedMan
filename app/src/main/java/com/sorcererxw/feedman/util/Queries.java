@@ -69,4 +69,15 @@ public class Queries {
         public static final String unread =
                 " SELECT * FROM ( SELECT *, ( SELECT COUNT(id) FROM entry e WHERE e.subscription_id = s.id AND e.account_id = s.account_id AND e.unread = 1 ) AS unread FROM subscription s WHERE account_id = ? ) AS subs WHERE unread > 0 ORDER BY title COLLATE NOCASE";
     }
+
+    public static final class CategoryQueries {
+        public static final String CATEGORIES_ORDERED_QUERY =
+                "SELECT *, CASE WHEN unread > 0 THEN 1 ELSE 0 END AS has_unread FROM ( SELECT *,(SELECT COUNT(*) FROM entry AS e WHERE e.account_id = c.account_id AND e.unread = 1 AND e.subscription_id IN (SELECT subscription_id FROM subscription_categories AS sc  WHERE sc.category_id = c.id AND sc.account_id = c.account_id)) as unread FROM category AS c  WHERE account_id = ? ) AS subs  ORDER BY has_unread DESC, label COLLATE NOCASE";
+        public static final String CATEGORIES_QUERY =
+                "SELECT *,(SELECT COUNT(*) FROM entry AS e WHERE e.account_id = c.account_id AND e.unread = 1 AND e.subscription_id IN (SELECT subscription_id FROM subscription_categories AS sc  WHERE sc.category_id = c.id AND sc.account_id = c.account_id)) as unread FROM category AS c  WHERE account_id = ?";
+        public static final String CATEGORIES_UNREAD_ENTRIES_QUERY =
+                "SELECT COUNT(*) FROM entry AS e WHERE e.account_id = c.account_id AND e.unread = 1 AND e.subscription_id IN (SELECT subscription_id FROM subscription_categories AS sc  WHERE sc.category_id = c.id AND sc.account_id = c.account_id)";
+        public static final String UNREAD_CATEGORIES_ORDERED_QUERY =
+                "SELECT *, (SELECT COUNT(*) FROM entry AS e WHERE e.account_id = c.account_id AND e.unread = 1 AND e.subscription_id IN (SELECT subscription_id FROM subscription_categories AS sc  WHERE sc.category_id = c.id AND sc.account_id = c.account_id)) as unread FROM category AS c  WHERE account_id = ?  AND unread > 0  ORDER BY label COLLATE NOCASE";
+    }
 }

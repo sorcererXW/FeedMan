@@ -4,8 +4,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.CheckResult;
-import android.support.annotation.StringDef;
-import android.transition.Transition;
 
 import com.sorcererxw.feedman.database.tables.EntryTable;
 import com.sorcererxw.feedman.models.Account;
@@ -15,12 +13,10 @@ import com.sorcererxw.feedman.models.FeedSubscription;
 import com.sorcererxw.feedman.util.Queries;
 import com.squareup.sqlbrite.BriteDatabase;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -81,14 +77,14 @@ public class Entries {
     @CheckResult
     public Observable<List<FeedEntry>> getAllEntries(Account account, int limit, int offset) {
         return getPaginateEntries(Queries.EntryQueries.all, limit, offset,
-                account.getId());
+                account.id());
     }
 
     @CheckResult
     public Observable<List<FeedEntry>> getUnreadEntries(Account account, int limit, int offset,
                                                         long includeReadSince) {
         return getPaginateEntries(Queries.EntryQueries.unread, limit, offset,
-                account.getId());
+                account.id());
     }
 
 
@@ -453,7 +449,7 @@ public class Entries {
     @CheckResult
     public Observable<Integer> getUnreadCount(Account account) {
         return mDatabase.createQuery(EntryTable.TABLE_NAME, Queries.EntryQueries.unread_count,
-                account.getId())
+                account.id())
                 .mapToOne(new Func1<Cursor, Integer>() {
                     @Override
                     public Integer call(Cursor cursor) {
@@ -465,7 +461,7 @@ public class Entries {
     @CheckResult
     public Observable<Integer> getAllCount(Account account) {
         return mDatabase.createQuery(EntryTable.TABLE_NAME, Queries.EntryQueries.all_count,
-                account.getId())
+                account.id())
                 .mapToOne(new Func1<Cursor, Integer>() {
                     @Override
                     public Integer call(Cursor cursor) {
@@ -477,7 +473,7 @@ public class Entries {
     @CheckResult
     public Observable<Integer> getStarredCount(Account account) {
         return mDatabase.createQuery(EntryTable.TABLE_NAME, Queries.EntryQueries.starred_count,
-                account.getId())
+                account.id())
                 .mapToOne(new Func1<Cursor, Integer>() {
                     @Override
                     public Integer call(Cursor cursor) {
@@ -490,7 +486,7 @@ public class Entries {
     public Observable<Integer> getUnreadCount(Account account, FeedCategory category) {
         return mDatabase.createQuery(EntryTable.TABLE_NAME,
                 Queries.EntryQueries.category_unread_count,
-                account.getId(), category.id(), account.getId())
+                account.id(), category.id(), account.id())
                 .mapToOne(new Func1<Cursor, Integer>() {
                     @Override
                     public Integer call(Cursor cursor) {
@@ -502,7 +498,7 @@ public class Entries {
     @CheckResult
     public Observable<Integer> getAllCount(Account account, FeedCategory category) {
         return mDatabase.createQuery(EntryTable.TABLE_NAME, Queries.EntryQueries.category_all_count,
-                account.getId(), category.id(), account.getId())
+                account.id(), category.id(), account.id())
                 .mapToOne(new Func1<Cursor, Integer>() {
                     @Override
                     public Integer call(Cursor cursor) {
@@ -515,7 +511,7 @@ public class Entries {
     public Observable<Integer> getStarredCount(Account account, FeedCategory category) {
         return mDatabase.createQuery(EntryTable.TABLE_NAME,
                 Queries.EntryQueries.category_starred_count,
-                account.getId(), category.id(), account.getId())
+                account.id(), category.id(), account.id())
                 .mapToOne(new Func1<Cursor, Integer>() {
                     @Override
                     public Integer call(Cursor cursor) {
@@ -540,7 +536,7 @@ public class Entries {
     public void clearStarredEntries(Account account) {
         ContentValues values = new ContentValues();
         values.put(EntryTable.TABLE_NAME, false);
-        mDatabase.update(EntryTable.TABLE_NAME, values, "account_id = ?", account.getId());
+        mDatabase.update(EntryTable.TABLE_NAME, values, "account_id = ?", account.id());
     }
 
     public void removedAccount(String accountId) {

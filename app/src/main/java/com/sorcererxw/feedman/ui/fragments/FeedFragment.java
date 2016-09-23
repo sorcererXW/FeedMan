@@ -7,8 +7,9 @@ import android.view.View;
 
 import com.sorcererxw.feedman.FeedManApp;
 import com.sorcererxw.feedman.R;
+import com.sorcererxw.feedman.models.FeedSubscription;
 import com.sorcererxw.feedman.network.api.feedly.FeedlyClient;
-import com.sorcererxw.feedman.network.api.feedly.FeedlySubscription;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlySubscription;
 import com.sorcererxw.feedman.ui.activities.EntryActivity;
 import com.sorcererxw.feedman.ui.adapters.BaseTextAdapter;
 import com.sorcererxw.feedman.ui.fragments.base.BaseFragment;
@@ -39,25 +40,25 @@ public class FeedFragment extends BaseFragment {
     @BindView(R.id.recyclerView_fragment_feed_list)
     RecyclerView mRecyclerView;
 
-    private BaseTextAdapter<FeedlySubscription> mAdapter;
+    private BaseTextAdapter<FeedSubscription> mAdapter;
 
     @Override
     protected void init(View view, Bundle saveInstance) {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(
                 new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        mAdapter = new BaseTextAdapter<FeedlySubscription>(getContext()) {
+        mAdapter = new BaseTextAdapter<FeedSubscription>(getContext()) {
             @Override
-            protected String convert(FeedlySubscription bean) {
-                return bean.getTitle();
+            protected String convert(FeedSubscription bean) {
+                return bean.title();
             }
         };
 
         mAdapter.setOnItemClickListener(
-                new BaseTextAdapter.OnItemClickListener<FeedlySubscription>() {
+                new BaseTextAdapter.OnItemClickListener<FeedSubscription>() {
                     @Override
-                    public void onItemClick(FeedlySubscription feedlySubscription) {
-                        EntryActivity.startActivity(getContext(), feedlySubscription.getId());
+                    public void onItemClick(FeedSubscription feedSubscription) {
+                        EntryActivity.startActivity(getContext(), feedSubscription.id());
 //                        FeedFragment.this
 //                                .addFragment(EntryFragment.newInstance(feedlySubscription.getId()));
                     }
@@ -67,15 +68,16 @@ public class FeedFragment extends BaseFragment {
 
         FeedlyClient client = new FeedlyClient(getContext(),
                 FeedManApp.getDB(getContext()).getAccounts()
-                        .getAccount(FeedManApp.getPrefs(getContext()).getCurrentAccount().getValue()));
+                        .getAccount(
+                                FeedManApp.getPrefs(getContext()).getCurrentAccount().getValue()));
 
         client.getSubscriptions()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<List<FeedlySubscription>>() {
+                .subscribe(new Action1<List<FeedSubscription>>() {
                     @Override
-                    public void call(List<FeedlySubscription> feedlySubscriptions) {
-                        mAdapter.setData(feedlySubscriptions);
+                    public void call(List<FeedSubscription> feedSubscriptions) {
+                        mAdapter.setData(feedSubscriptions);
                         mAdapter.notifyDataSetChanged();
                     }
                 }, new Action1<Throwable>() {

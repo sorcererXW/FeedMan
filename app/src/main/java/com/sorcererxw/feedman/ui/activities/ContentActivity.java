@@ -7,7 +7,7 @@ import android.text.Html;
 import android.widget.TextView;
 
 import com.sorcererxw.feedman.R;
-import com.sorcererxw.feedman.network.api.feedly.FeedlyEntry;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyEntry;
 import com.sorcererxw.feedman.ui.activities.base.BaseActivity;
 import com.sorcererxw.feedman.util.TemporaryBag;
 

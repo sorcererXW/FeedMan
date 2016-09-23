@@ -32,10 +32,12 @@ public class DB {
 
         mAccounts = new Accounts(mDatabase);
         mEntries = new Entries(mDatabase);
+        mCategories = new Categories(mDatabase);
     }
 
     private Accounts mAccounts;
     private Entries mEntries;
+    private Categories mCategories;
 
     public Accounts getAccounts() {
         return mAccounts;

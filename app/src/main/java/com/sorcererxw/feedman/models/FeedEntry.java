@@ -7,14 +7,12 @@ import android.graphics.drawable.ShapeDrawable;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.text.Html;
-import android.text.SpannableStringBuilder;
 
 import com.google.auto.value.AutoValue;
 import com.sorcererxw.feedman.BuildConfig;
 import com.sorcererxw.feedman.database.DB;
 import com.sorcererxw.feedman.database.tables.EntryTable;
-import com.sorcererxw.feedman.database.tables.SubscriptionTable;
-import com.sorcererxw.feedman.network.api.feedly.FeedlyEntry;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyEntry;
 
 import java.util.Date;
 
@@ -133,38 +131,38 @@ public abstract class FeedEntry implements Parcelable {
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
-        public abstract Builder accountId(String accountId);
+    public interface Builder {
+        Builder accountId(String accountId);
 
-        public abstract Builder author(String author);
+        Builder author(String author);
 
-        public abstract FeedEntry build();
+        FeedEntry build();
 
-        public abstract Builder content(String content);
+        Builder content(String content);
 
-        public abstract Builder id(String id);
+        Builder id(String id);
 
-        public abstract Builder published(Date published);
+        Builder published(Date published);
 
-        public abstract Builder readTimestamp(Date readTimeStamp);
+        Builder readTimestamp(Date readTimeStamp);
 
-        public abstract Builder starred(boolean starred);
+        Builder starred(boolean starred);
 
-        public abstract Builder subscriptionId(String subscriptionId);
+        Builder subscriptionId(String subscriptionId);
 
-        public abstract Builder subscriptionLabel(String subscriptionLabel);
+        Builder subscriptionLabel(String subscriptionLabel);
 
-        public abstract Builder subscriptionVisualUrl(String subscriptionVisualUrl);
+        Builder subscriptionVisualUrl(String subscriptionVisualUrl);
 
-        public abstract Builder summary(String summary);
+        Builder summary(String summary);
 
-        public abstract Builder thumbnail(String thumbnail);
+        Builder thumbnail(String thumbnail);
 
-        public abstract Builder title(String title);
+        Builder title(String title);
 
-        public abstract Builder unread(boolean unread);
+        Builder unread(boolean unread);
 
-        public abstract Builder url(String url);
+        Builder url(String url);
     }
 
     public ContentValues toContentValues() {

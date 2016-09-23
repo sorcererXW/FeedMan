@@ -8,8 +8,8 @@ import android.view.View;
 import com.sorcererxw.feedman.FeedManApp;
 import com.sorcererxw.feedman.R;
 import com.sorcererxw.feedman.network.api.feedly.FeedlyClient;
-import com.sorcererxw.feedman.network.api.feedly.FeedlyEntry;
-import com.sorcererxw.feedman.network.api.feedly.FeedlyStream;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyEntry;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyStream;
 import com.sorcererxw.feedman.ui.adapters.BaseTextAdapter;
 import com.sorcererxw.feedman.ui.fragments.base.BaseFragment;
 
@@ -75,7 +75,7 @@ public class EntryFragment extends BaseFragment {
         };
         mRecyclerView.setAdapter(mAdapter);
 
-        client.getFeedSteam(mFeedID, 20, false)
+        client.getFeedStream(mFeedID, 20, false)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<FeedlyStream>() {

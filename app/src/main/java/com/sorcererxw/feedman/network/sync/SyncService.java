@@ -21,7 +21,7 @@ public class SyncService extends IntentService {
 
     public static void sync(Context context, Account account) {
         Intent intent = new Intent(context, SyncService.class);
-        intent.putExtra(KEY_ACCOUNT_ID, account.getId());
+        intent.putExtra(KEY_ACCOUNT_ID, account.id());
         context.startActivity(intent);
     }
 
@@ -47,7 +47,7 @@ public class SyncService extends IntentService {
     private static final int SYNC_THRESHOLD_IN_SECONDS = 30;
 
     private boolean isEnableSync(Account account) {
-        Date date = FeedManApp.getPrefs(this).getLastSync(account.getId()).getValue();
+        Date date = FeedManApp.getPrefs(this).getLastSync(account.id()).getValue();
         if (date == null) {
             return true;
         }

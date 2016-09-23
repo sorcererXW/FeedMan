@@ -1,5 +1,7 @@
 package com.sorcererxw.feedman.network.api.feedly;
 
+import com.sorcererxw.feedman.network.api.feedly.FeedlyService;
+
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 

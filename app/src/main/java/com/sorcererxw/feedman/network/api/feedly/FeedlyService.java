@@ -1,6 +1,12 @@
 package com.sorcererxw.feedman.network.api.feedly;
 
-import com.sorcererxw.feedman.models.AccessToken;
+import com.sorcererxw.feedman.database.Categories;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyAccessToken;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyCategory;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyProfile;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyReadMarker;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyStream;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlySubscription;
 
 import java.util.List;
 
@@ -72,22 +78,26 @@ public interface FeedlyService {
 
     @POST("/v3/auth/token")
     @FormUrlEncoded
-    Observable<AccessToken> getAccessToken(@Field("code") String code,
-                                           @Field("client_id") String clientId,
-                                           @Field("client_secret") String clientSecret,
-                                           @Field("redirect_uri") String redirectUri,
-                                           @Field("grant_type") String grantType);
+    Observable<FeedlyAccessToken> getAccessToken(@Field("code") String code,
+                                                 @Field("client_id") String clientId,
+                                                 @Field("client_secret") String clientSecret,
+                                                 @Field("redirect_uri") String redirectUri,
+                                                 @Field("grant_type") String grantType);
 
     @POST("/v3/auth/token")
     @FormUrlEncoded
-    Observable<AccessToken> refreshAccessToken(@Field("refresh_token") String refreshToken,
-                                               @Field("client_id") String clientId,
-                                               @Field("client_secret") String clientSecret,
-                                               @Field("grant_type") String grantType);
+    Observable<FeedlyAccessToken> refreshAccessToken(@Field("refresh_token") String refreshToken,
+                                                     @Field("client_id") String clientId,
+                                                     @Field("client_secret") String clientSecret,
+                                                     @Field("grant_type") String grantType);
 
-    @GET("/v3/search/feeds")
-    Call<FeedlySearchResultBean> getSearchResult(@Query("query") String query,
-                                                 @Query("count") int count);
+    Call<FeedlyAccessToken> refreshAccessTokenCall(@Field("refresh_token") String refreshToken,
+                                                   @Field("client_id") String clientId,
+                                                   @Field("client_secret") String clientSecret,
+                                                   @Field("grant_type") String grantType);
+
+    @GET("/v3/categories")
+    Call<List<FeedlyCategory>> getCategories();
 
     @GET("/v3/profile")
     Observable<FeedlyProfile> getProfile();

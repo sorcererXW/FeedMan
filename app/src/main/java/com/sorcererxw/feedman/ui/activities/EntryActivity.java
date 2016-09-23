@@ -10,8 +10,8 @@ import com.socks.library.KLog;
 import com.sorcererxw.feedman.FeedManApp;
 import com.sorcererxw.feedman.R;
 import com.sorcererxw.feedman.network.api.feedly.FeedlyClient;
-import com.sorcererxw.feedman.network.api.feedly.FeedlyEntry;
-import com.sorcererxw.feedman.network.api.feedly.FeedlyStream;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyEntry;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyStream;
 import com.sorcererxw.feedman.ui.activities.base.BaseActivity;
 import com.sorcererxw.feedman.ui.adapters.BaseTextAdapter;
 
@@ -79,7 +79,7 @@ public class EntryActivity extends BaseActivity {
         });
         mRecyclerView.setAdapter(mAdapter);
 
-        client.getFeedSteam(mFeedId, 20, false)
+        client.getFeedStream(mFeedId, 20, false)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<FeedlyStream>() {

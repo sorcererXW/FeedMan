@@ -49,7 +49,7 @@ public class FeedlySyncManager extends SyncManager {
 
     @Override
     public void refreshToken() {
-
+//        getDB().getAccounts().updateAccount(Account.);
     }
 
     @Override
@@ -87,5 +87,13 @@ public class FeedlySyncManager extends SyncManager {
 
     private List<Subscription> refreshSubscription() throws IOException {
         return null;
+    }
+
+    private void refreshCategories(){
+    }
+
+    private void downloadMarkers(long fetchNewerThan){
+        BriteDatabase.Transaction transaction = getDB().newTransaction();
+
     }
 }

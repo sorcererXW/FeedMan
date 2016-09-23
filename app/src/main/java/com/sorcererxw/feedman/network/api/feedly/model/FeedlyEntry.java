@@ -1,4 +1,4 @@
-package com.sorcererxw.feedman.network.api.feedly;
+package com.sorcererxw.feedman.network.api.feedly.model;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -116,7 +116,7 @@ public class FeedlyEntry {
      */
 
     @SerializedName("categories")
-    private List<CategoriesBean> mCategories;
+    private List<FeedlyCategory> mCategories;
     /**
      * href : http://feedproxy.google.com/~r/Techcrunch/~3/iEm1aA_M_dw/
      * type : text/html
@@ -203,7 +203,7 @@ public class FeedlyEntry {
         return mTags;
     }
 
-    public List<CategoriesBean> getCategories() {
+    public List<FeedlyCategory> getCategories() {
         return mCategories;
     }
 
@@ -416,29 +416,6 @@ public class FeedlyEntry {
 
         public void setId(String id) {
             mId = id;
-        }
-    }
-
-    public static class CategoriesBean {
-        @SerializedName("id")
-        private String mId;
-        @SerializedName("label")
-        private String mLabel;
-
-        public String getId() {
-            return mId;
-        }
-
-        public void setId(String id) {
-            mId = id;
-        }
-
-        public String getLabel() {
-            return mLabel;
-        }
-
-        public void setLabel(String label) {
-            mLabel = label;
         }
     }
 

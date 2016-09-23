@@ -1,7 +1,7 @@
 package com.sorcererxw.feedman.util;
 
 
-import com.sorcererxw.feedman.network.api.feedly.FeedlyEntry;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyEntry;
 
 /**
  * @description:

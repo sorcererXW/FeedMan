@@ -8,6 +8,10 @@ import android.support.annotation.Nullable;
 import com.google.auto.value.AutoValue;
 import com.sorcererxw.feedman.database.DB;
 import com.sorcererxw.feedman.database.tables.SubscriptionTable;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyCategory;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyStream;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlySubscription;
+import com.sorcererxw.feedman.util.UniversalConverter;
 
 import java.util.List;
 
@@ -44,8 +48,27 @@ public abstract class FeedSubscription implements Parcelable {
         return contentValues;
     }
 
-    public static AutoValue_FeedSubscription.Builder builder() {
+    public static Builder builder() {
         return new AutoValue_FeedSubscription.Builder();
+    }
+
+    public static FeedSubscription from(final Account account,
+                                        FeedlySubscription feedlySubscription) {
+        return builder()
+                .accountId(account.id())
+                .id(feedlySubscription.getId())
+                .title(feedlySubscription.getTitle())
+                .visualUrl(feedlySubscription.getVisualUrl())
+                .website(feedlySubscription.getWebsite())
+                .categories(UniversalConverter.convertList(
+                        feedlySubscription.getCategories(),
+                        new UniversalConverter.Converter<FeedlyCategory, FeedCategory>() {
+                            @Override public FeedCategory convert(FeedlyCategory origin) {
+                                return FeedCategory.from(account, origin);
+                            }
+                        })
+                )
+                .build();
     }
 
     public static FeedSubscription from(Cursor cursor) {
@@ -59,19 +82,21 @@ public abstract class FeedSubscription implements Parcelable {
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
-        public abstract Builder accountId(String accountId);
+    public interface Builder {
+        Builder accountId(String accountId);
 
-        public abstract FeedSubscription build();
+        FeedSubscription build();
 
-        public abstract Builder id(String id);
+        Builder id(String id);
 
-        public abstract Builder title(String title);
+        Builder title(String title);
 
-        public abstract Builder unread(int unread);
+        Builder unread(int unread);
 
-        public abstract Builder visualUrl(String visualUrl);
+        Builder visualUrl(String visualUrl);
 
-        public abstract Builder website(String website);
+        Builder website(String website);
+
+        Builder categories(List<FeedCategory> categoryList);
     }
 }

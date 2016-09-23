@@ -8,6 +8,7 @@ import com.google.auto.value.AutoValue;
 import com.sorcererxw.feedman.database.DB;
 import com.sorcererxw.feedman.database.tables.CategoryTable;
 import com.sorcererxw.feedman.database.tables.EntryTable;
+import com.sorcererxw.feedman.network.api.feedly.model.FeedlyCategory;
 
 /**
  * @description:
@@ -30,6 +31,12 @@ public abstract class FeedCategory implements Parcelable {
         contentValues.put(CategoryTable.ACCOUNT_ID, accountId());
         contentValues.put(CategoryTable.LABEL, label());
         return contentValues;
+    }
+
+    public static FeedCategory from(Account account, FeedlyCategory feedlyCategory) {
+        return from(feedlyCategory.getId(),
+                account.id(),
+                feedlyCategory.getLabel());
     }
 
     public static FeedCategory from(String id, String accountId, String label) {

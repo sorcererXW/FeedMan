@@ -79,7 +79,7 @@ public abstract class SyncManager {
         mContext = context;
         mAccount = account;
         mDB = FeedManApp.getDB(context);
-        mLastSyncPreference = FeedManApp.getPrefs(context).getLastSync(account.getId());
+        mLastSyncPreference = FeedManApp.getPrefs(context).getLastSync(account.id());
     }
 
 

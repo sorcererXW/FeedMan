@@ -1,4 +1,4 @@
-package com.sorcererxw.feedman.network.api.feedly;
+package com.sorcererxw.feedman.network.api.feedly.model;
 
 import com.google.gson.annotations.SerializedName;
 
