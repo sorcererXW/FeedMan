@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.CheckResult;
 
 import com.sorcererxw.feedman.database.tables.EntryTable;
-import com.sorcererxw.feedman.models.Account;
+import com.sorcererxw.feedman.models.FeedAccount;
 import com.sorcererxw.feedman.models.FeedCategory;
 import com.sorcererxw.feedman.models.FeedEntry;
 import com.sorcererxw.feedman.models.FeedSubscription;
@@ -75,13 +75,13 @@ public class Entries {
     }
 
     @CheckResult
-    public Observable<List<FeedEntry>> getAllEntries(Account account, int limit, int offset) {
+    public Observable<List<FeedEntry>> getAllEntries(FeedAccount account, int limit, int offset) {
         return getPaginateEntries(Queries.EntryQueries.all, limit, offset,
                 account.id());
     }
 
     @CheckResult
-    public Observable<List<FeedEntry>> getUnreadEntries(Account account, int limit, int offset,
+    public Observable<List<FeedEntry>> getUnreadEntries(FeedAccount account, int limit, int offset,
                                                         long includeReadSince) {
         return getPaginateEntries(Queries.EntryQueries.unread, limit, offset,
                 account.id());
@@ -447,7 +447,7 @@ public class Entries {
     }
 
     @CheckResult
-    public Observable<Integer> getUnreadCount(Account account) {
+    public Observable<Integer> getUnreadCount(FeedAccount account) {
         return mDatabase.createQuery(EntryTable.TABLE_NAME, Queries.EntryQueries.unread_count,
                 account.id())
                 .mapToOne(new Func1<Cursor, Integer>() {
@@ -459,7 +459,7 @@ public class Entries {
     }
 
     @CheckResult
-    public Observable<Integer> getAllCount(Account account) {
+    public Observable<Integer> getAllCount(FeedAccount account) {
         return mDatabase.createQuery(EntryTable.TABLE_NAME, Queries.EntryQueries.all_count,
                 account.id())
                 .mapToOne(new Func1<Cursor, Integer>() {
@@ -471,7 +471,7 @@ public class Entries {
     }
 
     @CheckResult
-    public Observable<Integer> getStarredCount(Account account) {
+    public Observable<Integer> getStarredCount(FeedAccount account) {
         return mDatabase.createQuery(EntryTable.TABLE_NAME, Queries.EntryQueries.starred_count,
                 account.id())
                 .mapToOne(new Func1<Cursor, Integer>() {
@@ -483,7 +483,7 @@ public class Entries {
     }
 
     @CheckResult
-    public Observable<Integer> getUnreadCount(Account account, FeedCategory category) {
+    public Observable<Integer> getUnreadCount(FeedAccount account, FeedCategory category) {
         return mDatabase.createQuery(EntryTable.TABLE_NAME,
                 Queries.EntryQueries.category_unread_count,
                 account.id(), category.id(), account.id())
@@ -496,7 +496,7 @@ public class Entries {
     }
 
     @CheckResult
-    public Observable<Integer> getAllCount(Account account, FeedCategory category) {
+    public Observable<Integer> getAllCount(FeedAccount account, FeedCategory category) {
         return mDatabase.createQuery(EntryTable.TABLE_NAME, Queries.EntryQueries.category_all_count,
                 account.id(), category.id(), account.id())
                 .mapToOne(new Func1<Cursor, Integer>() {
@@ -508,7 +508,7 @@ public class Entries {
     }
 
     @CheckResult
-    public Observable<Integer> getStarredCount(Account account, FeedCategory category) {
+    public Observable<Integer> getStarredCount(FeedAccount account, FeedCategory category) {
         return mDatabase.createQuery(EntryTable.TABLE_NAME,
                 Queries.EntryQueries.category_starred_count,
                 account.id(), category.id(), account.id())
@@ -533,7 +533,7 @@ public class Entries {
                 "DELETE FROM entry WHERE subscription_id NOT IN (SELECT id FROM subscription) AND starred = 0");
     }
 
-    public void clearStarredEntries(Account account) {
+    public void clearStarredEntries(FeedAccount account) {
         ContentValues values = new ContentValues();
         values.put(EntryTable.TABLE_NAME, false);
         mDatabase.update(EntryTable.TABLE_NAME, values, "account_id = ?", account.id());

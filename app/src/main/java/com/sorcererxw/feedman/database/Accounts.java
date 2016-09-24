@@ -4,7 +4,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteQuery;
 
 import com.sorcererxw.feedman.database.tables.AccountTable;
-import com.sorcererxw.feedman.models.Account;
+import com.sorcererxw.feedman.models.FeedAccount;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 
@@ -29,28 +29,28 @@ public class Accounts {
         mDatabase = database;
     }
 
-    public void addAccount(Account account) {
+    public void addAccount(FeedAccount account) {
         mDatabase.insert(AccountTable.TABLE_NAME, account.toContentValues());
     }
 
-    public void updateAccount(Account account) {
+    public void updateAccount(FeedAccount account) {
         mDatabase.update(AccountTable.TABLE_NAME,
                 account.toContentValues(),
                 "id = ?",
                 account.id());
     }
 
-    public Observable<List<Account>> getAccounts() {
+    public Observable<List<FeedAccount>> getAccounts() {
         return mDatabase.createQuery(AccountTable.TABLE_NAME,
                 "SELECT a.* ,(SELECT COUNT(id) FROM subscription s WHERE s.account_id = a.id) AS subscription_count , (SELECT COUNT(id) FROM entry e WHERE e.account_id = a.id AND e.unread = 1) AS unread_count FROM account AS a",
                 new String[0])
-                .flatMap(new Func1<SqlBrite.Query, Observable<List<Account>>>() {
-                    @Override public Observable<List<Account>> call(SqlBrite.Query query) {
-                        List<Account> list = new ArrayList<>();
+                .flatMap(new Func1<SqlBrite.Query, Observable<List<FeedAccount>>>() {
+                    @Override public Observable<List<FeedAccount>> call(SqlBrite.Query query) {
+                        List<FeedAccount> list = new ArrayList<>();
                         Cursor cursor = query.run();
                         if (cursor != null) {
                             while (cursor.moveToNext()) {
-                                list.add(Account.from(cursor));
+                                list.add(FeedAccount.from(cursor));
                             }
                             cursor.close();
                         }
@@ -59,24 +59,24 @@ public class Accounts {
                 });
     }
 
-    public List<Account> getAccountsImmediate() {
+    public List<FeedAccount> getAccountsImmediate() {
         Cursor cursor = mDatabase.query("SELECT * FROM account");
-        List<Account> list = new ArrayList<>();
+        List<FeedAccount> list = new ArrayList<>();
         if(cursor!=null){
             while (cursor.moveToNext()){
-                list.add(Account.from(cursor));
+                list.add(FeedAccount.from(cursor));
             }
             cursor.close();
         }
         return list;
     }
 
-    public Account getAccount(String accountId) {
+    public FeedAccount getAccount(String accountId) {
         Cursor c = mDatabase.query(GET_ACCOUNT_QUERY, accountId);
-        Account account = null;
+        FeedAccount account = null;
         if (c != null) {
             if (c.moveToFirst()) {
-                account = Account.from(c);
+                account = FeedAccount.from(c);
             }
             c.close();
         }

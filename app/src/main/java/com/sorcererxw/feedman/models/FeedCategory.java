@@ -33,7 +33,7 @@ public abstract class FeedCategory implements Parcelable {
         return contentValues;
     }
 
-    public static FeedCategory from(Account account, FeedlyCategory feedlyCategory) {
+    public static FeedCategory from(FeedAccount account, FeedlyCategory feedlyCategory) {
         return from(feedlyCategory.getId(),
                 account.id(),
                 feedlyCategory.getLabel());

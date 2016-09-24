@@ -1,6 +1,7 @@
 package com.sorcererxw.feedman.network.api.feedly.model;
 
 import com.google.gson.annotations.SerializedName;
+import com.sorcererxw.feedman.models.FeedSubscription;
 
 import java.util.List;
 
@@ -21,6 +22,14 @@ public class FeedlySubscription {
      * sortid : 26152F8F
      * categories : [{"id":"user/c805fcbf-3acf-4302-a97e-d82f9d7c897f/category/design","label":"design"},{"id":"user/c805fcbf-3acf-4302-a97e-d82f9d7c897f/category/global.must","label":"must reads"}]
      */
+
+    public FeedlySubscription() {
+
+    }
+
+    public FeedlySubscription(String id) {
+        mId = id;
+    }
 
     @SerializedName("visualUrl")
     private String mVisualUrl;

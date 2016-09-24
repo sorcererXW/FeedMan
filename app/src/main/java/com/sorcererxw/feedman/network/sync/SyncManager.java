@@ -4,14 +4,14 @@ import android.content.Context;
 
 import com.sorcererxw.feedman.FeedManApp;
 import com.sorcererxw.feedman.database.DB;
-import com.sorcererxw.feedman.models.Account;
+import com.sorcererxw.feedman.models.FeedAccount;
+import com.sorcererxw.feedman.models.FeedSubscription;
 import com.sorcererxw.feedman.util.FeedManPreference;
 
 import java.util.Date;
 import java.util.List;
 
 import rx.Observable;
-import rx.Subscription;
 import rx.functions.Func1;
 
 /**
@@ -20,7 +20,7 @@ import rx.functions.Func1;
  * @date: 2016/9/16
  */
 public abstract class SyncManager {
-    private Account mAccount;
+    private FeedAccount mAccount;
     private Context mContext;
     private DB mDB;
     private FeedManPreference<Date> mLastSyncPreference;
@@ -39,9 +39,9 @@ public abstract class SyncManager {
 
     public abstract void sync();
 
-    public abstract Func1<Subscription, Observable<Subscription>> unsubscribe();
+    public abstract Func1<FeedSubscription, Observable<FeedSubscription>> unsubscribe();
 
-    protected Account getAccount() {
+    protected FeedAccount getAccount() {
         return mAccount;
     }
 
@@ -59,14 +59,14 @@ public abstract class SyncManager {
 
     public static SyncManager from(Context context, String accountId) {
         context = context.getApplicationContext();
-        Account account = FeedManApp.getDB(context).getAccounts().getAccount(accountId);
+        FeedAccount account = FeedManApp.getDB(context).accounts().getAccount(accountId);
         if (account == null) {
             throw new IllegalArgumentException("Account not found.");
         }
         return from(context, account);
     }
 
-    public static SyncManager from(Context context, Account account) {
+    public static SyncManager from(Context context, FeedAccount account) {
         if (account == null) {
             throw new NullPointerException("Account cannot be null.");
         }
@@ -75,7 +75,7 @@ public abstract class SyncManager {
         return new FeedlySyncManager(context, account);
     }
 
-    protected SyncManager(Context context, Account account) {
+    protected SyncManager(Context context, FeedAccount account) {
         mContext = context;
         mAccount = account;
         mDB = FeedManApp.getDB(context);

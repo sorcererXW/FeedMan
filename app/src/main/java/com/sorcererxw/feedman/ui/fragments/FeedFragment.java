@@ -9,7 +9,6 @@ import com.sorcererxw.feedman.FeedManApp;
 import com.sorcererxw.feedman.R;
 import com.sorcererxw.feedman.models.FeedSubscription;
 import com.sorcererxw.feedman.network.api.feedly.FeedlyClient;
-import com.sorcererxw.feedman.network.api.feedly.model.FeedlySubscription;
 import com.sorcererxw.feedman.ui.activities.EntryActivity;
 import com.sorcererxw.feedman.ui.adapters.BaseTextAdapter;
 import com.sorcererxw.feedman.ui.fragments.base.BaseFragment;
@@ -67,7 +66,7 @@ public class FeedFragment extends BaseFragment {
         mRecyclerView.setAdapter(mAdapter);
 
         FeedlyClient client = new FeedlyClient(getContext(),
-                FeedManApp.getDB(getContext()).getAccounts()
+                FeedManApp.getDB(getContext()).accounts()
                         .getAccount(
                                 FeedManApp.getPrefs(getContext()).getCurrentAccount().getValue()));
 

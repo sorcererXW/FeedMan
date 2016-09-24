@@ -52,7 +52,7 @@ public abstract class FeedSubscription implements Parcelable {
         return new AutoValue_FeedSubscription.Builder();
     }
 
-    public static FeedSubscription from(final Account account,
+    public static FeedSubscription from(final FeedAccount account,
                                         FeedlySubscription feedlySubscription) {
         return builder()
                 .accountId(account.id())

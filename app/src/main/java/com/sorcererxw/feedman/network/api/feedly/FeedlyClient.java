@@ -6,8 +6,8 @@ import android.text.TextUtils;
 import com.socks.library.KLog;
 import com.sorcererxw.feedman.R;
 import com.sorcererxw.feedman.database.tables.AccountTable;
-import com.sorcererxw.feedman.models.AccessToken;
-import com.sorcererxw.feedman.models.Account;
+import com.sorcererxw.feedman.models.FeedAccessToken;
+import com.sorcererxw.feedman.models.FeedAccount;
 import com.sorcererxw.feedman.models.FeedCategory;
 import com.sorcererxw.feedman.models.FeedEntry;
 import com.sorcererxw.feedman.models.FeedSubscription;
@@ -46,14 +46,14 @@ public class FeedlyClient {
     private String mClientSecret;
     private String mAuthRedirectUrl;
     private String mScope;
-    private Account mAccount;
-    private AccessToken mAccessToken;
+    private FeedAccount mAccount;
+    private FeedAccessToken mAccessToken;
 
     public FeedlyClient(Context context) {
         this(context, null);
     }
 
-    public FeedlyClient(Context context, Account account) {
+    public FeedlyClient(Context context, FeedAccount account) {
         mEndpoint = "https://" + context.getString(R.string.feedly_endpoint);
         mClientId = context.getString(R.string.feedly_client_id);
         mClientSecret = context.getString(R.string.feedly_client_secret);
@@ -97,7 +97,7 @@ public class FeedlyClient {
         return mAuthRedirectUrl;
     }
 
-    public Observable<Account> authenticate(String authenticationCode) {
+    public Observable<FeedAccount> authenticate(String authenticationCode) {
         return mFeedlyService.getAccessToken(
                 authenticationCode,
                 mClientId,
@@ -109,13 +109,13 @@ public class FeedlyClient {
                     @Override
                     public Observable<FeedlyProfile> call(FeedlyAccessToken token) {
                         KLog.d(token.toString());
-                        mAccessToken = AccessToken.from(token);
+                        mAccessToken = FeedAccessToken.from(token);
                         return mFeedlyService.getProfile();
                     }
                 })
-                .flatMap(new Func1<FeedlyProfile, Observable<Account>>() {
+                .flatMap(new Func1<FeedlyProfile, Observable<FeedAccount>>() {
                     @Override
-                    public Observable<Account> call(FeedlyProfile profile) {
+                    public Observable<FeedAccount> call(FeedlyProfile profile) {
                         String accountLabel = profile.getEmail();
                         if (TextUtils.isEmpty(accountLabel)) {
                             if (profile.getGivenName() != null && profile.getFamilyName() != null) {
@@ -125,14 +125,15 @@ public class FeedlyClient {
                                 accountLabel = "@" + profile.getTwitter();
                             }
                         }
-                        mAccount = Account.from(mAccessToken, profile.getId(), accountLabel);
+                        mAccount = FeedAccount.from(mAccessToken, profile.getId(), accountLabel);
                         return Observable.just(mAccount);
                     }
                 });
     }
 
-    public AccessToken refreshAccessToken(AccessToken currentAccessToken) throws IOException {
-        return AccessToken.from(
+    public FeedAccessToken refreshAccessToken(FeedAccessToken currentAccessToken)
+            throws IOException {
+        return FeedAccessToken.from(
                 NetworkUtil.executeApiCall(mFeedlyService.refreshAccessTokenCall(
                         currentAccessToken.refreshToken(),
                         mClientId,
@@ -141,7 +142,7 @@ public class FeedlyClient {
                 currentAccessToken.refreshToken());
     }
 
-    public List<FeedCategory> getCategory() throws IOException {
+    public List<FeedCategory> getCategories() throws IOException {
         List<FeedCategory> categoryList = new ArrayList<>();
         for (FeedlyCategory feedlyCategory :
                 NetworkUtil.executeApiCall(mFeedlyService.getCategories())) {
@@ -307,6 +308,30 @@ public class FeedlyClient {
                         return Observable.just(entryId);
                     }
                 });
+    }
+
+    public Observable<Void> subscribe(String feedId) {
+        return mFeedlyService.subscribe(new FeedlySubscription(feedId));
+    }
+
+    public Observable<FeedSubscription> unsubscribe(final FeedSubscription subscription) {
+        return mFeedlyService.unsubscribe(subscription.id())
+                .map(new Func1<Void, FeedSubscription>() {
+                    @Override public FeedSubscription call(Void aVoid) {
+                        return subscription;
+                    }
+                });
+    }
+
+    public Observable<List<String>> unsubscribe(List<String> subscriptionIds) {
+        return Observable.from(subscriptionIds)
+                .flatMap(new Func1<String, Observable<String>>() {
+                    @Override public Observable<String> call(String id) {
+                        mFeedlyService.unsubscribe(id);
+                        return Observable.just(id);
+                    }
+                })
+                .toList();
     }
 
 }

@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.socks.library.KLog;
 import com.sorcererxw.feedman.FeedManApp;
 import com.sorcererxw.feedman.R;
-import com.sorcererxw.feedman.models.Account;
+import com.sorcererxw.feedman.models.FeedAccount;
 import com.sorcererxw.feedman.ui.activities.MainActivity;
 
 import butterknife.BindView;
@@ -34,7 +34,7 @@ public abstract class WebAuthFragment extends BaseFragment {
     @BindView(R.id.webView_fragment_web_auth)
     WebView mWebView;
 
-    protected abstract Observable<Account> authenticate(String str);
+    protected abstract Observable<FeedAccount> authenticate(String str);
 
     protected abstract String getAuthenticationRedirectUrl();
 
@@ -71,9 +71,9 @@ public abstract class WebAuthFragment extends BaseFragment {
                 mSubscription.add(authenticate(Uri.parse(url).getQueryParameter("code"))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Action1<Account>() {
+                        .subscribe(new Action1<FeedAccount>() {
                             @Override
-                            public void call(Account account) {
+                            public void call(FeedAccount account) {
                                 WebAuthFragment.this.addAccount(account);
                             }
                         }, new Action1<Throwable>() {
@@ -129,10 +129,10 @@ public abstract class WebAuthFragment extends BaseFragment {
         mSubscription.unsubscribe();
     }
 
-    protected void addAccount(Account account) {
+    protected void addAccount(FeedAccount account) {
         Toast.makeText(getContext(), "has account", Toast.LENGTH_SHORT).show();
         FeedManApp.getPrefs(getContext()).getCurrentAccount().setValue(account.id());
-        FeedManApp.getDB(getContext()).getAccounts().addAccount(account);
+        FeedManApp.getDB(getContext()).accounts().addAccount(account);
         Intent intent = new Intent(getHoldingActivity(), MainActivity.class);
         getHoldingActivity().startActivity(intent);
     }

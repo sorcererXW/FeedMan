@@ -33,18 +33,28 @@ public class DB {
         mAccounts = new Accounts(mDatabase);
         mEntries = new Entries(mDatabase);
         mCategories = new Categories(mDatabase);
+        mSubscriptions = new Subscriptions(mDatabase);
     }
 
+    private Subscriptions mSubscriptions;
     private Accounts mAccounts;
     private Entries mEntries;
     private Categories mCategories;
 
-    public Accounts getAccounts() {
+    public Accounts accounts() {
         return mAccounts;
     }
 
-    public Entries getEntries() {
+    public Entries entries() {
         return mEntries;
+    }
+
+    public Categories categories() {
+        return mCategories;
+    }
+
+    public Subscriptions subscriptions() {
+        return mSubscriptions;
     }
 
     public BriteDatabase.Transaction newTransaction() {

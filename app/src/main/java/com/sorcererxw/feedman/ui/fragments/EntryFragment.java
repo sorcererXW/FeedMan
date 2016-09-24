@@ -55,7 +55,7 @@ public class EntryFragment extends BaseFragment {
         mFeedID = getArguments().getString(KEY_FEED_ID);
 
         FeedlyClient client = new FeedlyClient(getContext(),
-                FeedManApp.getDB(getContext()).getAccounts()
+                FeedManApp.getDB(getContext()).accounts()
                         .getAccount(FeedManApp.getPrefs(getContext()).getCurrentAccount().getValue()));
 
         mRecyclerView.setHasFixedSize(true);

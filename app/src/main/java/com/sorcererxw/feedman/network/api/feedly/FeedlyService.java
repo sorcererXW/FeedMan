@@ -1,6 +1,5 @@
 package com.sorcererxw.feedman.network.api.feedly;
 
-import com.sorcererxw.feedman.database.Categories;
 import com.sorcererxw.feedman.network.api.feedly.model.FeedlyAccessToken;
 import com.sorcererxw.feedman.network.api.feedly.model.FeedlyCategory;
 import com.sorcererxw.feedman.network.api.feedly.model.FeedlyProfile;

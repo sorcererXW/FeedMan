@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.sorcererxw.feedman.database.tables.CategoryTable;
 import com.sorcererxw.feedman.database.tables.EntryTable;
 import com.sorcererxw.feedman.database.tables.SubscriptionTable;
-import com.sorcererxw.feedman.models.Account;
+import com.sorcererxw.feedman.models.FeedAccount;
 import com.sorcererxw.feedman.models.FeedCategory;
 import com.sorcererxw.feedman.util.Queries;
 import com.squareup.sqlbrite.BriteDatabase;
@@ -32,7 +32,7 @@ public class Categories {
         mDatabase = database;
     }
 
-    public Observable<List<FeedCategory>> getCategories(Account account,
+    public Observable<List<FeedCategory>> getCategories(FeedAccount account,
                                                         boolean includeReadCategories) {
         String statement = includeReadCategories ?
                 Queries.CategoryQueries.CATEGORIES_ORDERED_QUERY :
@@ -63,7 +63,7 @@ public class Categories {
                 });
     }
 
-    public void updateCategories(Account account, List<FeedCategory> categoryList) {
+    public void updateCategories(FeedAccount account, List<FeedCategory> categoryList) {
         BriteDatabase.Transaction transaction = mDatabase.newTransaction();
         mDatabase.delete(CategoryTable.TABLE_NAME, "account_id = ?", account.id());
         for (FeedCategory category : categoryList) {

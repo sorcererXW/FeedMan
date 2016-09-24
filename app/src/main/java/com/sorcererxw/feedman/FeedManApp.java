@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 
 import com.sorcererxw.feedman.database.DB;
-import com.sorcererxw.feedman.models.Account;
 import com.sorcererxw.feedman.util.Prefs;
 
 /**

@@ -3,7 +3,7 @@ package com.sorcererxw.feedman.ui.fragments;
 import android.content.Context;
 
 import com.socks.library.KLog;
-import com.sorcererxw.feedman.models.Account;
+import com.sorcererxw.feedman.models.FeedAccount;
 import com.sorcererxw.feedman.network.api.feedly.FeedlyClient;
 import com.sorcererxw.feedman.ui.fragments.base.WebAuthFragment;
 
@@ -30,7 +30,7 @@ public class FeedlyAuthFragment extends WebAuthFragment {
     }
 
     @Override
-    protected Observable<Account> authenticate(String code) {
+    protected Observable<FeedAccount> authenticate(String code) {
         KLog.d(code);
         return mFeedlyClient.authenticate(code);
     }

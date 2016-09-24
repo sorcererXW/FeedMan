@@ -14,7 +14,7 @@ import com.sorcererxw.feedman.database.tables.AccountTable;
  * @date: 2016/9/9
  */
 @AutoValue
-public abstract class Account implements Parcelable {
+public abstract class FeedAccount implements Parcelable {
 
     @AutoValue.Builder
     public interface Builder {
@@ -24,11 +24,11 @@ public abstract class Account implements Parcelable {
 
         Builder label(String label);
 
-        Builder accessToken(AccessToken token);
+        Builder accessToken(FeedAccessToken token);
 
         Builder id(String id);
 
-        Account build();
+        FeedAccount build();
     }
 
     public abstract String id();
@@ -39,7 +39,7 @@ public abstract class Account implements Parcelable {
 
     public abstract long unreadCount();
 
-    public abstract AccessToken accessToken();
+    public abstract FeedAccessToken accessToken();
 
     public ContentValues toContentValues() {
         // TODO: 2016/9/23 account to contentValues
@@ -48,11 +48,15 @@ public abstract class Account implements Parcelable {
         return values;
     }
 
-    public static AutoValue_Account.Builder builder() {
-        return new AutoValue_Account.Builder();
+    public static AutoValue_FeedAccount.Builder builder() {
+        return new AutoValue_FeedAccount.Builder();
     }
 
-    public static Account from(AccessToken accessToken, String id, String label){
+    public static AutoValue_FeedAccount.Builder builder(FeedAccount account) {
+        return new AutoValue_FeedAccount.Builder(account);
+    }
+
+    public static FeedAccount from(FeedAccessToken accessToken, String id, String label) {
         return builder()
                 .accessToken(accessToken)
                 .id(id)
@@ -60,11 +64,17 @@ public abstract class Account implements Parcelable {
                 .build();
     }
 
-    public static Account from(Cursor cursor) {
+    public static FeedAccount from(FeedAccount originAccount, FeedAccessToken accessToken) {
+        return builder(originAccount)
+                .accessToken(accessToken)
+                .build();
+    }
+
+    public static FeedAccount from(Cursor cursor) {
         Builder builder = builder()
                 .id(DB.Getter.getString(cursor, AccountTable.ID))
                 .label(DB.Getter.getString(cursor, AccountTable.LABEL));
-        AccessToken accessToken = AccessToken.from(
+        FeedAccessToken accessToken = FeedAccessToken.from(
                 DB.Getter.getString(cursor, AccountTable.ACCESS_TOKEN),
                 DB.Getter.getString(cursor, AccountTable.REFRESH_TOKEN));
         builder.accessToken(accessToken);

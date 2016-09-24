@@ -8,7 +8,7 @@ import android.text.style.QuoteSpan;
 import com.sorcererxw.feedman.database.Categories;
 import com.sorcererxw.feedman.database.tables.EntryTable;
 import com.sorcererxw.feedman.database.tables.SubscriptionTable;
-import com.sorcererxw.feedman.models.Account;
+import com.sorcererxw.feedman.models.FeedAccount;
 import com.sorcererxw.feedman.models.FeedCategory;
 import com.sorcererxw.feedman.models.FeedSubscription;
 import com.sorcererxw.feedman.network.api.feedly.model.FeedlyStream;
@@ -36,7 +36,7 @@ public class Subscriptions {
         mDatabase = database;
     }
 
-    public Observable<List<FeedSubscription>> getSubscriptions(Account account,
+    public Observable<List<FeedSubscription>> getSubscriptions(FeedAccount account,
                                                                boolean includeReadSubscriptions) {
         String query = includeReadSubscriptions ?
                 Queries.SubscriptionQueries.all :
@@ -55,7 +55,7 @@ public class Subscriptions {
                 });
     }
 
-    public Observable<List<FeedSubscription>> getSubscriptions(Account account,
+    public Observable<List<FeedSubscription>> getSubscriptions(FeedAccount account,
                                                                FeedCategory category,
                                                                boolean includeReadSubscriptions) {
         String query = includeReadSubscriptions ?
@@ -75,7 +75,7 @@ public class Subscriptions {
                 });
     }
 
-    public List<FeedSubscription> getAllSubscription(Account account) {
+    public List<FeedSubscription> getAllSubscription(FeedAccount account) {
         List<FeedSubscription> result = new ArrayList<>();
         Cursor cursor = mDatabase.query("SELECT * FROM subscription WHERE account_id = ?",
                 account.id());
@@ -100,7 +100,7 @@ public class Subscriptions {
                 .first();
     }
 
-    public void refreshSubscriptions(Account account, List<FeedSubscription> subscriptions) {
+    public void refreshSubscriptions(FeedAccount account, List<FeedSubscription> subscriptions) {
         BriteDatabase.Transaction transaction = mDatabase.newTransaction();
         mDatabase.delete(SubscriptionTable.TABLE_NAME, "account_id = ?", account.id());
         for (FeedSubscription subscription : subscriptions) {
@@ -121,7 +121,7 @@ public class Subscriptions {
         transaction.end();
     }
 
-    public void markAsRead(Account account, String subscriptionId, long olderThan) {
+    public void markAsRead(FeedAccount account, String subscriptionId, long olderThan) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(EntryTable.UNREAD, false);
         mDatabase.update(EntryTable.TABLE_NAME, contentValues,

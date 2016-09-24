@@ -12,18 +12,18 @@ import com.sorcererxw.feedman.network.api.feedly.model.FeedlyAccessToken;
  */
 
 @AutoValue
-public abstract class AccessToken implements Parcelable {
+public abstract class FeedAccessToken implements Parcelable {
 
     public abstract String refreshToken();
 
     public abstract String accessToken();
 
-    public static AccessToken from(String accessToken, String refreshToken) {
-        return new AutoValue_AccessToken(accessToken, refreshToken);
+    public static FeedAccessToken from(String accessToken, String refreshToken) {
+        return new AutoValue_FeedAccessToken(accessToken, refreshToken);
     }
 
-    public static AccessToken from(FeedlyAccessToken accessToken) {
-        return new AutoValue_AccessToken(
+    public static FeedAccessToken from(FeedlyAccessToken accessToken) {
+        return new AutoValue_FeedAccessToken(
                 accessToken.getAccessToken(),
                 accessToken.getRefreshToken());
     }
