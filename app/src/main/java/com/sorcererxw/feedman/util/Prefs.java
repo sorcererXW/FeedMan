@@ -3,25 +3,41 @@ package com.sorcererxw.feedman.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import java.util.Date;
-
 /**
  * @description:
  * @author: Sorcerer
- * @date: 2016/9/13
+ * @date: 2016/12/18
  */
+
 public class Prefs {
-    private final SharedPreferences mPreferences;
+    private static Prefs mPrefs;
 
-    public Prefs(Context context) {
-        mPreferences = context.getSharedPreferences("FeedMan", Context.MODE_PRIVATE);
+    public static Prefs getInstance(Context context) {
+        if (mPrefs == null) {
+            mPrefs = new Prefs(context);
+        }
+        return mPrefs;
     }
 
-    public FeedManPreference<String> getCurrentAccount() {
-        return new FeedManPreference<>(mPreferences, "current_account", "");
+    private final SharedPreferences mSharedPreferences;
+
+    private Prefs(Context context) {
+        mSharedPreferences = context.getSharedPreferences("RSS", Context.MODE_PRIVATE);
     }
 
-    public FeedManPreference<Date> getLastSync(String accountId) {
-        return new FeedManPreference<>(mPreferences, "last_sync_" + accountId, new Date(0));
+    private static final String KEY_FEEDLY_ACCESS_TOKEN = "KEY_FEEDLY_ACCESS_TOKEN";
+    private static final String KEY_FEEDLY_REFRESH_TOKEN = "KEY_FEEDLY_REFRESH_TOKEN";
+    private static final String KEY_FEEDLY_ACCOUNT_ID = "KEY_FEEDLY_ACCOUNT_ID";
+
+    public RssPreference<String> getFeedlyAccessToken() {
+        return new RssPreference<>(mSharedPreferences, KEY_FEEDLY_ACCESS_TOKEN, "");
+    }
+
+    public RssPreference<String> getFeedlyRefreshToken() {
+        return new RssPreference<>(mSharedPreferences, KEY_FEEDLY_REFRESH_TOKEN, "");
+    }
+
+    public RssPreference<String> getFeedlyAccountId() {
+        return new RssPreference<>(mSharedPreferences, KEY_FEEDLY_ACCOUNT_ID, "");
     }
 }

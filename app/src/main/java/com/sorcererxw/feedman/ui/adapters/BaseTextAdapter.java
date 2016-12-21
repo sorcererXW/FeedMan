@@ -1,8 +1,9 @@
 package com.sorcererxw.feedman.ui.adapters;
 
 import android.content.Context;
-import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,99 +20,77 @@ import butterknife.ButterKnife;
 /**
  * @description:
  * @author: Sorcerer
- * @date: 2016/9/5
+ * @date: 2016/12/20
  */
-public abstract class BaseTextAdapter<E>
-        extends RecyclerView.Adapter<BaseTextAdapter.BaseTextViewHolder> {
 
-    static class BaseTextViewHolder extends RecyclerView.ViewHolder {
-
-        @BindView(R.id.textView_base_text_content)
-        TextView content;
-
-        BaseTextViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-    }
-
-    private List<E> mList;
+public class BaseTextAdapter extends RecyclerView.Adapter<BaseTextAdapter.TextViewHolder> {
 
     private Context mContext;
 
-    private OnItemClickListener<E> mOnItemClickListener;
-
     public BaseTextAdapter(Context context) {
         mContext = context;
-        mList = new ArrayList<>();
     }
 
-    public void setData(List<E> list) {
-        mList = list;
+    private List<String> mData = new ArrayList<>();
+
+    public void setData(List<String> data) {
+        mData = data;
         notifyDataSetChanged();
     }
 
-    public void addData(E bean) {
-        mList.add(bean);
+    private int mTextSize = 20;
+
+    public void setTextSize(int textSize) {
+        mTextSize = textSize;
         notifyDataSetChanged();
     }
 
-    public void addData(List<E> been) {
-        mList.addAll(been);
-        notifyDataSetChanged();
+    public interface OnItemClickListener {
+        void onItemClick(int position, String text);
     }
 
-    public void clearData() {
-        mList.clear();
-        notifyDataSetChanged();
-    }
+    private OnItemClickListener mOnItemClickListener;
 
-    public List<E> getData() {
-        return mList;
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
     }
 
     @Override
-    public BaseTextViewHolder onCreateViewHolder(ViewGroup parent,
-                                                 int viewType) {
-        return new BaseTextViewHolder(
+
+    public TextViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new TextViewHolder(
                 LayoutInflater.from(mContext).inflate(R.layout.item_base_text, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(final BaseTextViewHolder holder, int position) {
-        holder.content.setText(convert(mList.get(position)));
-        if (isBold(mList.get(position))) {
-            holder.content.setTypeface(null, Typeface.BOLD);
-        } else {
-            holder.content.setTypeface(null, Typeface.NORMAL);
-        }
-        if (mOnItemClickListener != null) {
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mOnItemClickListener.onItemClick(mList.get(holder.getAdapterPosition()));
+    public void onBindViewHolder(final TextViewHolder holder, int position) {
+        holder.text.setTextSize(TypedValue.COMPLEX_UNIT_SP, mTextSize);
+        holder.text.setText(mData.get(position));
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mOnItemClickListener != null) {
+                    mOnItemClickListener.onItemClick(holder.getAdapterPosition(),
+                            mData.get(holder.getAdapterPosition()));
                 }
-            });
-        }
+            }
+        });
+        holder.text.setTextColor(ContextCompat.getColor(mContext, R.color.colorTextPrimary));
     }
 
     @Override
     public int getItemCount() {
-        return mList.size();
+        return mData.size();
     }
 
-    protected abstract String convert(E bean);
+    static class TextViewHolder extends RecyclerView.ViewHolder {
 
-    public interface OnItemClickListener<E> {
-        void onItemClick(E e);
-    }
+        @BindView(R.id.textView_item_base_text)
+        TextView text;
 
-    public void setOnItemClickListener(OnItemClickListener<E> onItemClickListener) {
-        mOnItemClickListener = onItemClickListener;
-        notifyDataSetChanged();
-    }
-
-    public boolean isBold(E bean) {
-        return false;
+        public TextViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
     }
 }

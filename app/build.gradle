@@ -2,8 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     def Properties versionProps = new Properties()
     def versionPropsFile = file('version.properties')
@@ -16,19 +16,17 @@ android {
     defaultConfig {
         applicationId "com.sorcererxw.feedman"
         minSdkVersion 21
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0." + code
 
     }
     buildTypes {
         debug {
-            buildConfigField "boolean", "LOG_DEBUG", "true"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            buildConfigField "boolean", "LOG_DEBUG", "false"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -45,37 +43,54 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
-    compile 'com.android.support:cardview-v7:24.2.1'
-    compile 'com.android.support:recyclerview-v7:24.2.1'
-    compile 'com.android.support:support-v4:24.2.1'
-    // rx
-    compile 'io.reactivex:rxjava:1.1.9'
-    compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'com.artemzin.rxjava:proguard-rules:1.1.9.0'
-    // sqlbrite
-    compile 'com.squareup.sqlbrite:sqlbrite:0.7.0'
+    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:cardview-v7:25.1.0'
+    compile 'com.android.support:recyclerview-v7:25.1.0'
+    compile 'com.android.support:support-v4:25.1.0'
+    compile 'com.android.support:palette-v7:25.1.0'
     // retrofit
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
-        // material dialog
-    compile 'com.github.afollestad.material-dialogs:core:0.9.0.1'
-    compile 'com.github.afollestad.material-dialogs:commons:0.9.0.1'
-    // butter knife
+    compile 'com.squareup.retrofit2:retrofit-converters:2.1.0'
+    compile 'com.squareup.retrofit2:retrofit-adapters:2.1.0'
+    // sqlbrite
+    compile 'com.squareup.sqlbrite:sqlbrite:1.1.0'
+    // okhttp
+    compile 'com.squareup.okhttp3:okhttp:3.5.0'
+    // timber
+    compile 'com.jakewharton.timber:timber:4.4.0'
+    // rx
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'io.reactivex:rxjava:1.2.3'
+    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.0@aar'
+    compile 'com.artemzin.rxjava:proguard-rules:1.2.3.0'
+    compile 'com.github.VictorAlbertos:RxActivityResult:0.3.9'
+    // butterknife
     compile 'com.jakewharton:butterknife:8.4.0'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
-    // gson
-    compile 'com.google.code.gson:gson:2.7'
-    // okhttp
-    compile 'com.squareup.okhttp3:okhttp:3.4.1'
-    // oauth
-    compile 'org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.0'
-    // log
-    compile 'com.github.zhaokaiqiang.klog:library:1.5.0'
-    // auto parcel
-    provided 'frankiesardo:auto-parcel:1.0.3'
-    apt 'frankiesardo:auto-parcel:1.0.3'
+    // glide
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
+    compile 'com.jakewharton:process-phoenix:1.1.1'
+    compile 'org.jsoup:jsoup:1.10.1'
+    compile 'net.opacapp:multiline-collapsingtoolbar:1.3.1'
+    compile 'com.afollestad.material-dialogs:core:0.9.1.0'
+    compile 'com.afollestad.material-dialogs:commons:0.9.1.0'
+    compile('com.mikepenz:materialdrawer:5.8.1@aar') {
+        transitive = true
+    }
+    compile 'com.github.woxingxiao:BubbleSeekBar:v1.4'
+    compile 'org.adw.library:discrete-seekbar:1.0.1'
+    compile "com.github.ksoichiro:android-observablescrollview:1.6.0"
+
+    // autoValue
+    provided 'com.google.auto.value:auto-value:1.2'
+    apt 'com.google.auto.value:auto-value:1.2'
+    apt 'com.ryanharter.auto.value:auto-value-parcel:0.2.5'
 }

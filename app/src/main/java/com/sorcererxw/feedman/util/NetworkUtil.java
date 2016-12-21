@@ -2,44 +2,43 @@ package com.sorcererxw.feedman.util;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiManager;
-
-import com.sorcererxw.feedman.network.api.ApiRequestException;
 
 import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
+import static android.content.Context.CONNECTIVITY_SERVICE;
+
 /**
  * @description:
  * @author: Sorcerer
- * @date: 2016/9/2
+ * @date: 2016/12/18
  */
+
 public class NetworkUtil {
-
-    public static boolean isWifiEnabled(Context context) {
-        return isNetworkEnabled(context) && ((WifiManager) context
-                .getSystemService(Context.WIFI_SERVICE)).isWifiEnabled();
-    }
-
-    public static boolean isNetworkEnabled(Context context) {
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
-
     public static boolean isOnWifi(Context context) {
         if (context == null) {
             return false;
         }
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI;
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo wifiInfo = cm.getNetworkInfo(1);
+        if (wifiInfo != null && wifiInfo.isConnectedOrConnecting()) {
+            return true;
+        }
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnectedOrConnecting() && netInfo.getType() == 1) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isNetworkAvailable(Context context) {
+        NetworkInfo netInfo = ((ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE))
+                .getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     public static <T> T executeApiCall(Call<T> call) throws IOException {
@@ -47,6 +46,6 @@ public class NetworkUtil {
         if (response.isSuccessful()) {
             return response.body();
         }
-        throw new ApiRequestException(response.message(), response.code());
+        throw new IOException("message: " + response.message() + "\nresponse: " + response.code());
     }
 }

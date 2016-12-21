@@ -6,24 +6,39 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
-        android:name=".FeedManApp"
+        android:name=".RssApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activities.WelcomeActivity">
+        <activity
+            android:name=".ui.activities.WelcomeActivity"
+            android:label="Welcome">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
+                <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.MainActivity"/>
-        <activity android:name=".ui.activities.ContentActivity"/>
-        <activity android:name=".ui.activities.AuthActivity"/>
-        <activity android:name=".ui.activities.EntryActivity">
+        <activity
+            android:name=".ui.activities.AuthActivity"
+            android:label="Auth"/>
+        <activity
+            android:name=".ui.activities.MainActivity"
+            android:label="@string/app_name">
         </activity>
+        <activity
+            android:name=".ui.activities.EntryActivity"
+            android:theme="@style/subActivityTheme"/>
+        <activity
+            android:name=".ui.activities.ArticleActivity"
+            android:theme="@style/subActivityTheme"/>
+        <activity
+            android:name=".ui.activities.SettingsActivity"
+            android:label="Settings"
+            android:theme="@style/subActivityTheme"/>
     </application>
 
 </manifest>

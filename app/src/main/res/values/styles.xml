@@ -3,9 +3,27 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">#212121</item>
-        <item name="colorPrimaryDark">#000</item>
-        <item name="colorAccent">#212121</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <!--<item name="android:colorBackground">@color/colorBackground</item>-->
+        <item name="android:windowContentTransitions">true</item>
+        <!--<item name="android:windowTranslucentStatus">true</item>-->
+        <!--<item name="android:textColorPrimary">@color/colorTextPrimary</item>-->
+        <!--<item name="android:textColorSecondary">@color/colorTextSecondary</item>-->
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+
     </style>
+
+    <style name="subActivityTheme" parent="AppTheme">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+
+    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@android:color/white</item>
+    </style>
+
 
 </resources>
