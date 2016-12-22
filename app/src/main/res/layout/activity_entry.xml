@@ -7,7 +7,7 @@
     android:fitsSystemWindows="true"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.sorcererxw.demo.rss.ui.activities.EntryActivity">
+    tools:context="com.sorcererxw.feedman.ui.activities.EntryActivity">
 
     <include layout="@layout/layout_appbar"/>
 

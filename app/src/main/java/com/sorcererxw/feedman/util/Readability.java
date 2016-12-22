@@ -33,25 +33,11 @@ public class Readability {
         mDocument = Jsoup.parse(html);
     }
 
-    public Readability(String html, String baseUri) {
-        super();
-        mDocument = Jsoup.parse(html, baseUri);
-    }
-
-    public Readability(File in, String charsetName, String baseUri) throws IOException {
-        super();
-        mDocument = Jsoup.parse(in, charsetName, baseUri);
-    }
-
     public Readability(URL url, int timeoutMillis) throws IOException {
         super();
         mDocument = Jsoup.parse(url, timeoutMillis);
     }
 
-    public Readability(Document doc) {
-        super();
-        mDocument = doc;
-    }
 
     /**
      * 工作流程:
@@ -65,24 +51,17 @@ public class Readability {
      */
     private void init(boolean preserveUnlikelyCandidates) {
 
-        /* 创建副本 */
         if (mDocument.body() != null && mBodyCache == null) {
             mBodyCache = mDocument.body().html();
         }
 
         prepDocument();
 
-        /* 建立DOM树 */
         Element overlay = mDocument.createElement("div");
         Element innerDiv = mDocument.createElement("div");
         Element articleTitle = getArticleTitle();
         Element articleContent = grabArticle(preserveUnlikelyCandidates);
 
-        /**
-         * 检测是否处理过度, 当把所有可能不是文章的元素剔除了, 没有其他内容了
-         * 如果是这样就使用保守的方法进行处理, 保留可能的内容
-         * 如果保守处理还是没有内容, 说明当前算法无法处理这个文本
-         */
         if (isEmpty(getInnerText(articleContent, false))) {
             if (!preserveUnlikelyCandidates) {
                 mDocument.body().html(mBodyCache);
@@ -94,12 +73,10 @@ public class Readability {
             }
         }
 
-        /* 将数据重新组合起来 */
         innerDiv.appendChild(articleTitle);
         innerDiv.appendChild(articleContent);
         overlay.appendChild(innerDiv);
 
-        /* 移除旧的数据, 插入新的数据 */
         mDocument.body().html("");
         mDocument.body().prependChild(overlay);
 
@@ -109,45 +86,30 @@ public class Readability {
         init(false);
     }
 
-    /**
-     * @return inner html
-     */
     public final String html() {
         return mDocument.html();
     }
 
-    /**
-     * @return outer html
-     */
     public final String outerHtml() {
         return mDocument.outerHtml();
     }
 
-    /**
-     * @return 根据h1标签提取文章的标题
-     */
     protected Element getArticleTitle() {
         Element articleTitle = mDocument.createElement("h1");
         articleTitle.html(mDocument.title());
         return articleTitle;
     }
 
-    /**
-     * 预处理文档内容, 剔除其中的非必要元素 (js, css和标签)
-     */
     protected void prepDocument() {
-        /* 防止文档内容为空 */
         if (mDocument.body() == null) {
             mDocument.appendElement("body");
         }
 
-        /* 移除js */
         Elements elementsToRemove = mDocument.getElementsByTag("script");
         for (Element script : elementsToRemove) {
             script.remove();
         }
 
-        /* 移除css */
         elementsToRemove = getElementsByTag(mDocument.head(), "link");
         for (Element styleSheet : elementsToRemove) {
             if ("stylesheet".equalsIgnoreCase(styleSheet.attr("rel"))) {
@@ -155,25 +117,17 @@ public class Readability {
             }
         }
 
-        /* 移除标签 */
         elementsToRemove = mDocument.getElementsByTag("style");
         for (Element styleTag : elementsToRemove) {
             styleTag.remove();
         }
 
-        /* 转换重复换行(br) 为普通段落(p) */
         mDocument.body().html(
                 mDocument.body().html()
                         .replaceAll(Patterns.REGEX_REPLACE_BRS, "</p><p>")
                         .replaceAll(Patterns.REGEX_REPLACE_FONTS, "<$1span>"));
     }
 
-    /**
-     * Prepare the article node for display. Clean out any inline styles,
-     * iframes, forms, strip extraneous &lt;p&gt; tags, etc.
-     *
-     * @param articleContent
-     */
     private void prepArticle(Element articleContent) {
         cleanStyles(articleContent);
         killBreaks(articleContent);
@@ -182,10 +136,7 @@ public class Readability {
         clean(articleContent, "form");
         clean(articleContent, "object");
         clean(articleContent, "h1");
-        /**
-         * If there is only one h2, they are probably using it as a header and
-         * not a subheader, so remove it since we already have a header.
-         */
+
         if (getElementsByTag(articleContent, "h2").size() == 1) {
             clean(articleContent, "h2");
         }
@@ -193,15 +144,10 @@ public class Readability {
 
         cleanHeaders(articleContent);
 
-        /*
-         * Do these last as the previous stuff may have removed junk that will
-         * affect these
-         */
         cleanConditionally(articleContent, "table");
         cleanConditionally(articleContent, "ul");
         cleanConditionally(articleContent, "div");
 
-        /* Remove extra paragraphs */
         Elements articleParagraphs = getElementsByTag(articleContent, "p");
         for (Element articleParagraph : articleParagraphs) {
             int imgCount = getElementsByTag(articleParagraph, "img").size();
@@ -224,12 +170,6 @@ public class Readability {
         }
     }
 
-    /**
-     * Initialize a node with the readability object. Also checks the
-     * className/id for special names to add to its score.
-     *
-     * @param node
-     */
     private static void initializeNode(Element node) {
         node.attr(CONTENT_SCORE, Integer.toString(0));
 
@@ -262,38 +202,16 @@ public class Readability {
         incrementContentScore(node, getClassWeight(node));
     }
 
-    /**
-     * Using a variety of metrics (content score, classname, element types),
-     * find the content that ismost likely to be the stuff a user wants to read.
-     * Then return it wrapped up in a div.
-     * <p>
-     * 通过多种方法(内容权重, 类名, 节点类型) 来寻找最关键的数据
-     * 通过div包裹返回
-     *
-     * @param preserveUnlikelyCandidates
-     * @return
-     */
+
     protected Element grabArticle(boolean preserveUnlikelyCandidates) {
-        /**
-         * First, node prepping. Trash nodes that look cruddy (like ones with
-         * the class name "comment", etc), and turn divs into P tags where they
-         * have been used inappropriately (as in, where they contain no other
-         * block level elements.)
-         *
-         * Note: Assignment from index for performance. See
-         * http://www.peachpit.com/articles/article.aspx?p=31567&seqNum=5 TODO:
-         * Shouldn't this be a reverse traversal?
-         **/
+
         for (Element node : mDocument.getAllElements()) {
-            /* 移除可能无用的元素 */
             if (!preserveUnlikelyCandidates) {
                 String unlikelyMatchString = node.className() + node.id();
-                /* 一些常见的控件元素 */
                 Matcher unlikelyCandidatesMatcher = Patterns
                         .get(Patterns.RegEx.UNLIKELY_CANDIDATES)
                         .matcher(
                                 unlikelyMatchString);
-                /* 一些常见的文章元素 */
                 Matcher maybeCandidateMatcher = Patterns.get(
                         Patterns.RegEx.OK_MAYBE_ITS_A_CANDIDATE).matcher(
                         unlikelyMatchString);
@@ -306,7 +224,6 @@ public class Readability {
                 }
             }
 
-            /* 将空div转换为p */
             if ("div".equalsIgnoreCase(node.tagName())) {
                 Matcher matcher =
                         Patterns.get(Patterns.RegEx.DIV_TO_P_ELEMENTS).matcher(node.html());
@@ -322,13 +239,6 @@ public class Readability {
             }
         }
 
-        /**
-         * Loop through all paragraphs, and assign a score to them based on how
-         * content-y they look. Then add their score to their parent node.
-         *
-         * A score is determined by things like number of commas, class names,
-         * etc. Maybe eventually link density.
-         **/
         Elements allParagraphs = mDocument.getElementsByTag("p");
         ArrayList<Element> candidates = new ArrayList<>();
 
@@ -337,20 +247,15 @@ public class Readability {
             Element grandParentNode = parentNode.parent();
             String innerText = getInnerText(node, true);
 
-            /*
-             * If this paragraph is less than 25 characters, don't even count it.
-             */
             if (innerText.length() < 25) {
                 continue;
             }
 
-            /* Initialize readability data for the parent. */
             if (!parentNode.hasAttr("readabilityContentScore")) {
                 initializeNode(parentNode);
                 candidates.add(parentNode);
             }
 
-            /* Initialize readability data for the grandparent. */
             if (!grandParentNode.hasAttr("readabilityContentScore")) {
                 initializeNode(grandParentNode);
                 candidates.add(grandParentNode);
@@ -358,34 +263,19 @@ public class Readability {
 
             int contentScore = 0;
 
-            /* Add a point for the paragraph itself as a base. */
             contentScore++;
 
-            /* Add points for any commas within this paragraph */
             contentScore += innerText.split(",").length;
 
-            /*
-             * For every 100 characters in this paragraph, add another point. Up
-             * to 3 points.
-             */
             contentScore += Math.min(Math.floor(innerText.length() / 100), 3);
 
-            /* Add the score to the parent. The grandparent gets half. */
             incrementContentScore(parentNode, contentScore);
             incrementContentScore(grandParentNode, contentScore / 2);
         }
 
-        /**
-         * After we've calculated scores, loop through all of the possible
-         * candidate nodes we found and find the one with the highest score.
-         */
         Element topCandidate = null;
         for (Element candidate : candidates) {
-            /**
-             * Scale the final candidates score based on link density. Good
-             * content should have a relatively small link density (5% or less)
-             * and be mostly unaffected by this operation.
-             */
+
             scaleContentScore(candidate, 1 - getLinkDensity(candidate));
 
             log("Candidate: (" + candidate.className() + ":" + candidate.id()
@@ -397,11 +287,6 @@ public class Readability {
             }
         }
 
-        /**
-         * If we still have no top candidate, just use the body as a last
-         * resort. We also have to copy the body node so it is something we can
-         * modify.
-         */
         if (topCandidate == null || "body".equalsIgnoreCase(topCandidate.tagName())) {
             topCandidate = mDocument.createElement("div");
             topCandidate.html(mDocument.body().html());
@@ -410,11 +295,6 @@ public class Readability {
             initializeNode(topCandidate);
         }
 
-        /**
-         * Now that we have the top candidate, look through its siblings for
-         * content that might also be related. Things like preambles, content
-         * split by ads that we removed, etc.
-         */
         Element articleContent = mDocument.createElement("div");
         articleContent.attr("id", "readability-content");
         int siblingScoreThreshold = Math.max(10,
@@ -451,31 +331,16 @@ public class Readability {
             if (append) {
                 log("Appending node: " + siblingNode);
 
-                /*
-                 * Append sibling and subtract from our list because it removes
-                 * the node when you append to another node
-                 */
                 articleContent.appendChild(siblingNode);
                 continue;
             }
         }
 
-        /**
-         * So we have all of the content that we need. Now we clean it up for
-         * presentation.
-         */
         prepArticle(articleContent);
 
         return articleContent;
     }
 
-    /**
-     * 提取节点里面的内容
-     *
-     * @param e               节点
-     * @param normalizeSpaces 是否移除重复空格
-     * @return 节点内容
-     */
     private static String getInnerText(Element e, boolean normalizeSpaces) {
         String textContent = e.text().trim();
 
@@ -486,13 +351,6 @@ public class Readability {
         return textContent;
     }
 
-    /**
-     * Get the number of times a string s appears in the node e.
-     *
-     * @param e
-     * @param s
-     * @return
-     */
     private static int getCharCount(Element e, String s) {
         if (s == null || s.length() == 0) {
             s = ",";
@@ -500,11 +358,6 @@ public class Readability {
         return getInnerText(e, true).split(s).length;
     }
 
-    /**
-     * Remove the style attribute on every e and under.
-     *
-     * @param e
-     */
     private static void cleanStyles(Element e) {
         if (e == null) {
             return;
@@ -512,14 +365,11 @@ public class Readability {
 
         Element cur = e.children().first();
 
-        // Remove any root styles, if we're able.
         if (!"readability-styled".equals(e.className())) {
             e.removeAttr("style");
         }
 
-        // Go until there are no more child nodes
         while (cur != null) {
-            // Remove style attributes
             if (!"readability-styled".equals(cur.className())) {
                 cur.removeAttr("style");
             }
@@ -528,14 +378,6 @@ public class Readability {
         }
     }
 
-    /**
-     * Get the density of links as a percentage of the content. This is the
-     * amount of text that is inside a link divided by the total text in the
-     * node.
-     *
-     * @param e
-     * @return
-     */
     private static float getLinkDensity(Element e) {
         Elements links = getElementsByTag(e, "a");
         int textLength = getInnerText(e, true).length();
@@ -546,17 +388,9 @@ public class Readability {
         return linkLength / textLength;
     }
 
-    /**
-     * Get an elements class/id weight. Uses regular expressions to tell if this
-     * element looks good or bad.
-     *
-     * @param e
-     * @return
-     */
     private static int getClassWeight(Element e) {
         int weight = 0;
 
-        /* Look for a special classname */
         String className = e.className();
         if (!isEmpty(className)) {
             Matcher negativeMatcher = Patterns.get(Patterns.RegEx.NEGATIVE)
@@ -571,7 +405,6 @@ public class Readability {
             }
         }
 
-        /* Look for a special ID */
         String id = e.id();
         if (!isEmpty(id)) {
             Matcher negativeMatcher = Patterns.get(Patterns.RegEx.NEGATIVE)
@@ -589,22 +422,10 @@ public class Readability {
         return weight;
     }
 
-    /**
-     * Remove extraneous break tags from a node.
-     *
-     * @param e
-     */
     private static void killBreaks(Element e) {
         e.html(e.html().replaceAll(Patterns.REGEX_KILL_BREAKS, "<br />"));
     }
 
-    /**
-     * Clean a node of all elements of type "tag". (Unless it's a youtube/vimeo
-     * video. People love movies.)
-     *
-     * @param e
-     * @param tag
-     */
     private static void clean(Element e, String tag) {
         Elements targetList = getElementsByTag(e, tag);
         boolean isEmbed = "object".equalsIgnoreCase(tag)
@@ -621,24 +442,9 @@ public class Readability {
         }
     }
 
-    /**
-     * Clean an element of all tags of type "tag" if they look fishy. "Fishy" is
-     * an algorithm based on content length, classnames, link density, number of
-     * images & embeds, etc.
-     *
-     * @param e
-     * @param tag
-     */
     private void cleanConditionally(Element e, String tag) {
         Elements tagsList = getElementsByTag(e, tag);
 
-        /**
-         * Gather counts for other typical elements embedded within. Traverse
-         * backwards so we can remove nodes at the same time without effecting
-         * the traversal.
-         *
-         * TODO: Consider taking into account original contentScore here.
-         */
         for (Element node : tagsList) {
             int weight = getClassWeight(node);
 
@@ -648,11 +454,6 @@ public class Readability {
             if (weight < 0) {
                 node.remove();
             } else if (getCharCount(node, ",") < 10) {
-                /**
-                 * If there are not very many commas, and the number of
-                 * non-paragraph elements is more than paragraphs or other
-                 * ominous signs, remove the element.
-                 */
                 int p = getElementsByTag(node, "p").size();
                 int img = getElementsByTag(node, "img").size();
                 int li = getElementsByTag(node, "li").size() - 100;
@@ -696,12 +497,6 @@ public class Readability {
         }
     }
 
-    /**
-     * Clean out spurious headers from an Element. Checks things like classnames
-     * and link density.
-     *
-     * @param e
-     */
     private static void cleanHeaders(Element e) {
         for (int headerIndex = 1; headerIndex < 7; headerIndex++) {
             Elements headers = getElementsByTag(e, "h" + headerIndex);
@@ -736,8 +531,6 @@ public class Readability {
         private static Pattern sVideoRe;
         private static final String REGEX_REPLACE_BRS = "(?i)(<br[^>]*>[ \n\r\t]*){2,}";
         private static final String REGEX_REPLACE_FONTS = "(?i)<(\\/?)font[^>]*>";
-        /* Java has String.trim() */
-        // private static final String REGEX_TRIM = "^\\s+|\\s+$";
         private static final String REGEX_NORMALIZE = "\\s{2,}";
         private static final String REGEX_KILL_BREAKS = "(<br\\s*\\/?>(\\s|&nbsp;?)*){1,}";
 
@@ -807,12 +600,6 @@ public class Readability {
         }
     }
 
-    /**
-     * Reads the content score.
-     *
-     * @param node
-     * @return
-     */
     private static int getContentScore(Element node) {
         try {
             return Integer.parseInt(node.attr(CONTENT_SCORE));
@@ -821,14 +608,6 @@ public class Readability {
         }
     }
 
-    /**
-     * Increase or decrease the content score for an Element by an
-     * increment/decrement.
-     *
-     * @param node
-     * @param increment
-     * @return
-     */
     private static Element incrementContentScore(Element node, int increment) {
         int contentScore = getContentScore(node);
         contentScore += increment;
@@ -836,13 +615,6 @@ public class Readability {
         return node;
     }
 
-    /**
-     * Scales the content score for an Element with a factor of scale.
-     *
-     * @param node
-     * @param scale
-     * @return
-     */
     private static Element scaleContentScore(Element node, float scale) {
         int contentScore = getContentScore(node);
         contentScore *= scale;
@@ -850,27 +622,12 @@ public class Readability {
         return node;
     }
 
-    /**
-     * Jsoup's Element.getElementsByTag(Element e) includes e itself, which is
-     * different from W3C standards. This utility function is exclusive of the
-     * Element e.
-     *
-     * @param e
-     * @param tag
-     * @return
-     */
     private static Elements getElementsByTag(Element e, String tag) {
         Elements es = e.getElementsByTag(tag);
         es.remove(e);
         return es;
     }
 
-    /**
-     * Helper utility to determine whether a given String is empty.
-     *
-     * @param s
-     * @return
-     */
     private static boolean isEmpty(String s) {
         return s == null || s.length() == 0;
     }

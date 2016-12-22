@@ -1,24 +1,33 @@
 package com.sorcererxw.feedman.ui.activities;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 
 
 import com.sorcererxw.feedman.R;
-import com.sorcererxw.feedman.RssApp;
+import com.sorcererxw.feedman.FeedManApp;
 import com.sorcererxw.feedman.data.FeedEntry;
 import com.sorcererxw.feedman.data.FeedSubscription;
 import com.sorcererxw.feedman.database.Db;
 import com.sorcererxw.feedman.feedly.FeedlyClient;
+import com.sorcererxw.feedman.ui.adapters.BaseTextAdapter;
 import com.sorcererxw.feedman.ui.adapters.EntryAdapter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -26,9 +35,12 @@ import butterknife.ButterKnife;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
+
+import static android.widget.LinearLayout.VERTICAL;
 
 /**
  * @description:
@@ -59,9 +71,12 @@ public class EntryActivity extends SlideInAndOutAppCompatActivity {
     private int mType;
     private FeedSubscription mFeedSubscription;
 
+    private Context mContext;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = this;
         mType = getIntent().getIntExtra("type", 0x0);
         if (mType == TYPE_SUBSCRIPTION) {
             mFeedSubscription = getIntent().getParcelableExtra("subscription");
@@ -77,12 +92,97 @@ public class EntryActivity extends SlideInAndOutAppCompatActivity {
         mToolbar.setTitleTextColor(Color.WHITE);
 
         mAdapter = new EntryAdapter(this);
+        mAdapter.setOnItemLongClickListener(new EntryAdapter.OnItemLongClickListener() {
+            private static final String MARK_AS_READ = "mark as read";
+            private static final String MARK_AS_UNREAD = "mark as unread";
+            private static final String MARK_AS_STARRED = "mark as starred";
+            private static final String MARK_AS_UNSTARRED = "mark as unstarred";
+
+            @Override
+            public void onItemLongClick(final FeedEntry entry) {
+                final BottomSheetDialog dialog = new BottomSheetDialog(mContext);
+                RecyclerView recyclerView = new RecyclerView(mContext);
+                ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT);
+                recyclerView.setLayoutParams(layoutParams);
+                BaseTextAdapter adapter = new BaseTextAdapter(mContext);
+                List<String> list = new ArrayList<>();
+                if (entry.unread()) {
+                    list.add(MARK_AS_READ);
+                } else {
+                    list.add(MARK_AS_UNREAD);
+                }
+                adapter.setData(list);
+                adapter.setOnItemClickListener(new BaseTextAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(int position, String text) {
+                        if (MARK_AS_UNREAD.equals(text)) {
+                            mFeedlyClient.markAsUnread(Collections.singletonList(entry.id()))
+                                    .subscribeOn(Schedulers.newThread()).subscribe(
+                                    new Action1<String[]>() {
+                                        @Override
+                                        public void call(String[] strings) {
+                                            mDb.entries().markAsUnread(Arrays.asList(strings));
+                                        }
+                                    }, new Action1<Throwable>() {
+                                        @Override
+                                        public void call(Throwable throwable) {
+                                            Timber.e(throwable);
+                                        }
+                                    });
+                        } else if (MARK_AS_READ.equals(text)) {
+                            mFeedlyClient.markAsRead(Collections.singletonList(entry.id()))
+                                    .subscribeOn(Schedulers.newThread()).subscribe(
+                                    new Action1<String[]>() {
+                                        @Override
+                                        public void call(String[] strings) {
+                                            mDb.entries().markAsRead(Arrays.asList(strings));
+                                        }
+                                    }, new Action1<Throwable>() {
+                                        @Override
+                                        public void call(Throwable throwable) {
+                                            Timber.e(throwable);
+                                        }
+                                    });
+                        }
+                        dialog.dismiss();
+                    }
+                });
+                recyclerView.setAdapter(adapter);
+                recyclerView.setLayoutManager(new LinearLayoutManager(mContext, VERTICAL, false));
+                dialog.setContentView(recyclerView);
+                dialog.show();
+            }
+        });
+
+        final GestureDetector gestureDetector = new GestureDetector(this,
+                new GestureDetector.SimpleOnGestureListener() {
+                    @Override
+                    public boolean onDoubleTap(MotionEvent e) {
+                        mRecyclerView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mRecyclerView.smoothScrollToPosition(0);
+                            }
+                        });
+                        return super.onDoubleTap(e);
+                    }
+                });
+        mToolbar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                gestureDetector.onTouchEvent(event);
+                return true;
+            }
+        });
+
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        mFeedlyClient = RssApp.getFeedlyClient(this);
-        mDb = RssApp.getDb(this);
+        mFeedlyClient = FeedManApp.getFeedlyClient(this);
+        mDb = FeedManApp.getDb(this);
 
         Observable<List<FeedEntry>> dbObservable;
         switch (mType) {
@@ -107,7 +207,6 @@ public class EntryActivity extends SlideInAndOutAppCompatActivity {
                 .subscribe(new Subscriber<List<FeedEntry>>() {
                     @Override
                     public void onCompleted() {
-
                     }
 
                     @Override
@@ -183,8 +282,8 @@ public class EntryActivity extends SlideInAndOutAppCompatActivity {
         });
     }
 
-    private void setActionBarTitle(String title){
-        if(getSupportActionBar()!=null) {
+    private void setActionBarTitle(String title) {
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(title);
         }
     }

@@ -1,12 +1,17 @@
 package com.sorcererxw.feedman.ui.activities;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -14,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -25,7 +31,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.sorcererxw.feedman.R;
-import com.sorcererxw.feedman.RssApp;
+import com.sorcererxw.feedman.FeedManApp;
 import com.sorcererxw.feedman.data.FeedEntry;
 import com.sorcererxw.feedman.database.Db;
 import com.sorcererxw.feedman.feedly.FeedlyClient;
@@ -34,6 +40,8 @@ import com.sorcererxw.feedman.util.Readability;
 
 import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout;
 
+import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
@@ -133,7 +141,8 @@ public class ArticleActivity extends SlideInAndOutAppCompatActivity {
         mOriginTitleText.setText(mFeedEntry.subscriptionTitle());
 
         mPublishedText.setText(
-                new SimpleDateFormat("MM/dd/yyyy").format(new Date(mFeedEntry.published())));
+                new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+                        .format(new Date(mFeedEntry.published())));
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -152,11 +161,10 @@ public class ArticleActivity extends SlideInAndOutAppCompatActivity {
             }
         });
 
-        showContent(mFeedEntry.content());
-        FeedlyClient feedlyClient = RssApp.getFeedlyClient(this);
-        mDb = RssApp.getDb(this);
+        FeedlyClient feedlyClient = FeedManApp.getFeedlyClient(this);
+        mDb = FeedManApp.getDb(this);
         feedlyClient.markAsRead(Collections.singletonList(mFeedEntry.id()))
-                .subscribeOn(Schedulers.newThread()).subscribe(
+                .subscribeOn(Schedulers.io()).subscribe(
                 new Action1<String[]>() {
                     @Override
                     public void call(String[] strings) {
@@ -168,6 +176,8 @@ public class ArticleActivity extends SlideInAndOutAppCompatActivity {
                         Timber.e(throwable);
                     }
                 });
+
+        setReadability(FeedManApp.prefs(this).autoReadability().getValue());
 
         mFontButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,62 +215,7 @@ public class ArticleActivity extends SlideInAndOutAppCompatActivity {
         mReadabilityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Observable.just(mReadabilitied).map(new Func1<Boolean, String>() {
-                    @Override
-                    public String call(Boolean aBoolean) {
-                        if (aBoolean) {
-                            return mFeedEntry.content();
-                        } else {
-                            Readability readability = new Readability(mFeedEntry.content());
-                            readability.init();
-                            return readability.outerHtml();
-                        }
-                    }
-                })
-                        .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Subscriber<String>() {
-                            private ProgressDialog mDialog;
-
-                            @Override
-                            public void onStart() {
-                                super.onStart();
-                                mDialog = new ProgressDialog(mContext);
-                                mDialog.setCanceledOnTouchOutside(false);
-                                mDialog.setCancelable(false);
-                                mDialog.show();
-                            }
-
-                            @Override
-                            public void onCompleted() {
-                                mDialog.dismiss();
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                Timber.e(e);
-                                mDialog.dismiss();
-                            }
-
-                            @Override
-                            public void onNext(String content) {
-                                showContent(content);
-                                if (mReadabilitied) {
-                                    mReadabilityButton.setImageResource(
-                                            R.drawable.ic_format_indent_increase_white_24dp);
-                                } else {
-                                    mReadabilityButton.setImageResource(
-                                            R.drawable.ic_format_align_justify_white_24dp);
-                                }
-                                mReadabilitied = !mReadabilitied;
-                                mNestedScrollView.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mNestedScrollView.smoothScrollTo(0, 0);
-                                    }
-                                });
-                            }
-                        });
+                setReadability(!mReadabilitied);
             }
         });
 
@@ -283,6 +238,11 @@ public class ArticleActivity extends SlideInAndOutAppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     private void showContent(String content) {
         mWebviewContainer.removeAllViews();
         mWebView = new WebView(this);
@@ -294,6 +254,14 @@ public class ArticleActivity extends SlideInAndOutAppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 view.loadUrl("javascript:document.body.style.margin=\"8%\"; void 0");
             }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                mContext.startActivity(i);
+                return true;
+            }
+
         });
         mWebView.setLayoutParams(layoutParams);
         setFontSize(mFontSize);
@@ -349,4 +317,75 @@ public class ArticleActivity extends SlideInAndOutAppCompatActivity {
                 DisplayUtil.px2sp(ArticleActivity.this, fontSize));
     }
 
+    private void setReadability(boolean readability) {
+        Observable.just(readability).map(new Func1<Boolean, String>() {
+            @Override
+            public String call(Boolean aBoolean) {
+                mReadabilitied = aBoolean;
+                if (aBoolean) {
+                    String res = "";
+                    try {
+                        Readability readability = new Readability(new URL(mFeedEntry.url()), 3000);
+                        readability.init();
+                        res = readability.outerHtml();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return res;
+                } else {
+                    return mFeedEntry.content();
+                }
+            }
+        })
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<String>() {
+                    private ProgressDialog mDialog;
+
+                    @Override
+                    public void onStart() {
+                        super.onStart();
+                        mDialog = new ProgressDialog(mContext);
+                        mDialog.setCanceledOnTouchOutside(false);
+                        mDialog.setCancelable(false);
+                        mDialog.show();
+                    }
+
+                    @Override
+                    public void onCompleted() {
+                        mDialog.dismiss();
+                        if (mReadabilitied) {
+                            mReadabilityButton.setImageResource(
+                                    R.drawable.ic_format_align_justify_white_24dp);
+                        } else {
+                            mReadabilityButton.setImageResource(
+                                    R.drawable.ic_format_indent_increase_white_24dp);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Timber.e(e);
+                        mDialog.dismiss();
+                        if (mReadabilitied) {
+                            mReadabilityButton.setImageResource(
+                                    R.drawable.ic_format_align_justify_white_24dp);
+                        } else {
+                            mReadabilityButton.setImageResource(
+                                    R.drawable.ic_format_indent_increase_white_24dp);
+                        }
+                    }
+
+                    @Override
+                    public void onNext(String content) {
+                        showContent(content);
+                        mNestedScrollView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mNestedScrollView.smoothScrollTo(0, 0);
+                            }
+                        });
+                    }
+                });
+    }
 }

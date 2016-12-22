@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Reading">
+        <!--<ListPreference-->
+            <!--android:entries="@array/font_size"-->
+            <!--android:key="KEY_READING_FONT_SIZE"-->
+            <!--android:title="Default article font size"/>-->
+        <SwitchPreference
+            android:key="KEY_READING_AUTO_READABILITY"
+            android:summary="Make article more readable automatically"
+            android:textColor="@color/colorTextPrimary"
+            android:title="Readability article automatically"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Synchronization">
+        <SwitchPreference
+            android:key="KEY_SYNCHRONIZATION_AUTO_DOWNLOAD"
+            android:summary="New articles will be downloaded every hour"
+            android:textColor="@color/colorTextPrimary"
+            android:title="Automatic download articles"/>
+        <SwitchPreference
+            android:key="KEY_SYNCHRONIZATION_ONLY_WIFI"
+            android:summaryOff="New articles will be downloaded both on WiFi and cellular networks"
+            android:summaryOn="New articles will be downloaded only on WiFi"
+            android:textColor="@color/colorTextPrimary"
+            android:title="Automatic refresh only on WiFi"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Account">
+        <Preference
+            android:key="KEY_ACCOUNT_LOGOUT"
+            android:summary="You would loss all local data after logging out your account"
+            android:textColor="@color/colorTextPrimary"
+            android:title="Logout"/>
+    </PreferenceCategory>
+</PreferenceScreen>

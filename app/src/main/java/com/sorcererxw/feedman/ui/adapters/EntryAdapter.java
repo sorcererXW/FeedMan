@@ -3,6 +3,9 @@ package com.sorcererxw.feedman.ui.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,8 +23,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import timber.log.Timber;
 
 /**
@@ -33,7 +34,6 @@ import timber.log.Timber;
 public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.EntryViewHolder> {
 
     private List<FeedEntry> mEntryList = new ArrayList<>();
-    private List<FeedEntry> mUnreadList = new ArrayList<>();
     private Context mContext;
 
     public EntryAdapter(Context context) {
@@ -41,31 +41,16 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.EntryViewHol
     }
 
     public void setEntries(List<FeedEntry> list) {
-        mEntryList = list;
-
-        rx.Observable.from(list).filter(new Func1<FeedEntry, Boolean>() {
-            @Override
-            public Boolean call(FeedEntry feedlyEntry) {
-                return feedlyEntry.unread();
-            }
-        }).toList().subscribe(new Action1<List<FeedEntry>>() {
-            @Override
-            public void call(List<FeedEntry> entries) {
-                mUnreadList = entries;
-                notifyDataSetChanged();
-            }
-        });
-    }
-
-    private boolean mOnlyUnread = false;
-
-    public void setOnlyUnread(boolean onlyUnread) {
-        mOnlyUnread = onlyUnread;
-        notifyDataSetChanged();
-    }
-
-    public boolean isOnlyUnread() {
-        return mOnlyUnread;
+        boolean init = mEntryList.isEmpty();
+        List<FeedEntry> oldList = mEntryList;
+        mEntryList = new ArrayList<>(list);
+        if (init) {
+            notifyDataSetChanged();
+        }else {
+            DiffUtil.DiffResult result =
+                    DiffUtil.calculateDiff(new EntryDiffUtilCallback(oldList, mEntryList), true);
+            result.dispatchUpdatesTo(this);
+        }
     }
 
     @Override
@@ -76,16 +61,8 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.EntryViewHol
 
     @Override
     public void onBindViewHolder(final EntryViewHolder holder, int position) {
-        final FeedEntry feedEntry =
-                mOnlyUnread ? mUnreadList.get(position) : mEntryList.get(position);
+        final FeedEntry feedEntry = mEntryList.get(position);
 
-        if (feedEntry == null) {
-            holder.title.setText("");
-            holder.summary.setText("");
-            holder.from.setText("\n\n");
-            holder.itemView.setOnClickListener(null);
-            return;
-        }
         String from = new SimpleDateFormat("MM/dd/yyyy").format(new Date(feedEntry.published()))
                 + " ● " + feedEntry.subscriptionTitle();
         holder.from.setText(from);
@@ -131,10 +108,22 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.EntryViewHol
     }
 
     @Override
-    public int getItemCount() {
-        if (mOnlyUnread) {
-            return mUnreadList.size();
+    public void onBindViewHolder(EntryViewHolder holder, int position, List<Object> payloads) {
+        super.onBindViewHolder(holder, position, payloads);
+        if (payloads == null || payloads.isEmpty()) {
+            return;
         }
+        Bundle bundle = (Bundle) payloads.get(0);
+        boolean unread = bundle.getBoolean(EntryDiffUtilCallback.KEY_UNREAD);
+        if (unread) {
+            holder.itemView.setAlpha(1f);
+        } else {
+            holder.itemView.setAlpha(0.5f);
+        }
+    }
+
+    @Override
+    public int getItemCount() {
         return mEntryList.size();
     }
 
@@ -148,7 +137,6 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.EntryViewHol
         void onItemLongClick(FeedEntry entry);
     }
 
-
     static class EntryViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.textView_item_entry_title)
@@ -160,9 +148,56 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.EntryViewHol
         @BindView(R.id.textView_item_entry_from)
         TextView from;
 
-        public EntryViewHolder(View itemView) {
+        EntryViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+    }
+
+    private static class EntryDiffUtilCallback extends DiffUtil.Callback {
+        private List<FeedEntry> mOldList;
+        private List<FeedEntry> mNewList;
+
+        EntryDiffUtilCallback(List<FeedEntry> oldList, List<FeedEntry> newList) {
+            mOldList = oldList;
+            mNewList = newList;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return mOldList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return mNewList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return mOldList.get(oldItemPosition).equals(mNewList.get(newItemPosition));
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return mOldList.get(oldItemPosition).unread() == mNewList.get(newItemPosition).unread();
+        }
+
+        static final String KEY_UNREAD = "key_unread";
+
+        @Nullable
+        @Override
+        public Object getChangePayload(int oldItemPosition, int newItemPosition) {
+            FeedEntry oldEntry = mOldList.get(oldItemPosition);
+            FeedEntry newEntry = mNewList.get(newItemPosition);
+            Bundle diffBundle = new Bundle();
+            if (oldEntry.unread() != newEntry.unread()) {
+                diffBundle.putBoolean(KEY_UNREAD, newEntry.unread());
+            }
+            if (diffBundle.size() == 0) {
+                return null;
+            }
+            return diffBundle;
         }
     }
 }

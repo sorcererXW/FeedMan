@@ -185,17 +185,20 @@ https://feedly.com/v3/auth/auth?response_type=code&client_id=quote&redirect_uri=
                         do {
                             if (newerThan == -1) {
                                 if (continuation == null) {
-                                    call = mFeedlyService.getFeedStream(id, size, true);
+                                    call = mFeedlyService.getFeedStream(id, size, false,
+                                            System.currentTimeMillis() - 86400000);
                                 } else {
                                     call = mFeedlyService
-                                            .getFeedStream(id, size, true, continuation);
+                                            .getFeedStream(id, size, false,
+                                                    System.currentTimeMillis() - 86400000,
+                                                    continuation);
                                 }
                             } else {
                                 if (continuation == null) {
-                                    call = mFeedlyService.getFeedStream(id, size, true, newerThan);
+                                    call = mFeedlyService.getFeedStream(id, size, false, newerThan);
                                 } else {
                                     call = mFeedlyService
-                                            .getFeedStream(id, size, true, newerThan, continuation);
+                                            .getFeedStream(id, size, false, newerThan, continuation);
                                 }
                             }
                             FeedlyStream stream = null;

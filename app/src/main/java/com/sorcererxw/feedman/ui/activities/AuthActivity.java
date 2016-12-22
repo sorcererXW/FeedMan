@@ -12,7 +12,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.sorcererxw.feedman.R;
-import com.sorcererxw.feedman.RssApp;
+import com.sorcererxw.feedman.FeedManApp;
 import com.sorcererxw.feedman.feedly.FeedlyAccount;
 import com.sorcererxw.feedman.feedly.FeedlyClient;
 
@@ -64,13 +64,13 @@ public class AuthActivity extends AppCompatActivity {
                         .subscribe(new Action1<FeedlyAccount>() {
                             @Override
                             public void call(FeedlyAccount account) {
-                                RssApp.prefs(AuthActivity.this).getFeedlyAccessToken()
+                                FeedManApp.prefs(AuthActivity.this).getFeedlyAccessToken()
                                         .setValue(account.getFeedlyToken().getAccessToken(), true);
-                                RssApp.prefs(AuthActivity.this).getFeedlyRefreshToken()
+                                FeedManApp.prefs(AuthActivity.this).getFeedlyRefreshToken()
                                         .setValue(account.getFeedlyToken().getRefreshToken(), true);
-                                RssApp.prefs(AuthActivity.this).getFeedlyAccountId()
+                                FeedManApp.prefs(AuthActivity.this).getFeedlyAccountId()
                                         .setValue(account.getId(), true);
-                                RssApp.restartApp(AuthActivity.this);
+                                FeedManApp.restartApp(AuthActivity.this);
                             }
                         }, new Action1<Throwable>() {
                             @Override

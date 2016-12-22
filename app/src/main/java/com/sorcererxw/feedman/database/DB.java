@@ -5,6 +5,7 @@ import android.database.Cursor;
 
 import com.sorcererxw.feedman.database.executors.Entries;
 import com.sorcererxw.feedman.database.executors.Subscriptions;
+import com.sorcererxw.feedman.database.tables.SubscriptionTable;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 

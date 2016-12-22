@@ -9,6 +9,8 @@ import com.sorcererxw.feedman.database.Db;
 import com.sorcererxw.feedman.database.tables.EntryTable;
 import com.sorcererxw.feedman.feedly.FeedlyEntry;
 
+import java.util.Objects;
+
 /**
  * @description:
  * @author: Sorcerer
@@ -16,7 +18,7 @@ import com.sorcererxw.feedman.feedly.FeedlyEntry;
  */
 
 @AutoValue
-public abstract class FeedEntry implements Parcelable{
+public abstract class FeedEntry implements Parcelable {
 
     public abstract String id();
 
@@ -102,5 +104,31 @@ public abstract class FeedEntry implements Parcelable{
         values.put(EntryTable.SUMMARY, summary());
         values.put(EntryTable.URL, url());
         return values;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof FeedEntry)) {
+            return false;
+        }
+        return Objects.equals(((FeedEntry) obj).id(), id());
+    }
+
+    @Override
+    public String toString() {
+        return "FeedlyEntry{" +
+                "\n unread=" + unread() +
+                "\n, summary=" + summary() +
+                "\n, content=" + content() +
+                "\n, id='" + id() + '\'' +
+                "\n, title='" + title() + '\'' +
+                "\n, published=" + published() +
+                "\n, subscriptionId=" + subscriptionId() +
+                "\n, subscriptionTitle=" + subscriptionTitle() +
+                "\n, url=" + url() +
+                "\n}";
     }
 }

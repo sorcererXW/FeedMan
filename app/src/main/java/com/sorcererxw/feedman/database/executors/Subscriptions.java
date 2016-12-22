@@ -25,6 +25,10 @@ public class Subscriptions {
         mBriteDatabase = database;
     }
 
+    public void clearSubscriptions() {
+        mBriteDatabase.delete(SubscriptionTable.TABLE_NAME, null);
+    }
+
     public Observable<List<FeedSubscription>> getSubscriptions() {
         return mBriteDatabase.createQuery(SubscriptionTable.TABLE_NAME, subscriptions.all)
                 .mapToList(new Func1<Cursor, FeedSubscription>() {

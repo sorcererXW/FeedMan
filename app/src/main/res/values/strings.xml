@@ -1,3 +1,18 @@
 <resources>
-    <string name="app_name">Feed</string>
+    <string name="app_name">Feed Man</string>
+
+    <string-array name="font_size">
+        <item>minimum</item>
+        <item>small</item>
+        <item>medium</item>
+        <item>big</item>
+        <item>maximum</item>
+    </string-array>
+    <string-array name="font_size_value">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
 </resources>

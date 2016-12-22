@@ -1,6 +1,7 @@
 package com.sorcererxw.feedman.ui.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +12,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 import com.sorcererxw.feedman.R;
 
 import java.util.ArrayList;
@@ -65,6 +69,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             } else {
                 mRequestManager
                         .load(mCategoryItemList.get(position).getIconUrl())
+                        .placeholder(new IconicsDrawable(mContext, GoogleMaterial.Icon.gmd_rss_feed)
+                                .sizeDp(24)
+                                .color(Color.BLACK)
+                                .alpha(128)
+                                .paddingDp(4))
                         .into(holder.icon);
             }
             holder.itemView
